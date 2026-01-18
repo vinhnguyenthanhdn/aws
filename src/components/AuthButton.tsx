@@ -9,13 +9,15 @@ export const AuthButton: React.FC = () => {
     useEffect(() => {
         // Check active session
         supabase.auth.getSession().then(({ data: { session } }) => {
+            console.log('Current Session:', session);
             setUser(session?.user ?? null);
         });
 
         // Listen for auth changes
         const {
             data: { subscription },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
+        } = supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth Event:', event, session);
             setUser(session?.user ?? null);
         });
 
@@ -26,7 +28,9 @@ export const AuthButton: React.FC = () => {
         await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: window.location.origin
+                redirectTo: import.meta.env.PROD
+                    ? 'https://quizz-aws.vercel.app'
+                    : window.location.origin
             }
         });
     };
