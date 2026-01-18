@@ -7,24 +7,36 @@ export const AuthButton: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
-        console.log('Current URL:', window.location.href);
+        const handleAuth = async () => {
+            console.log('Current URL:', window.location.href);
 
-        // Check for errors in URL
-        const params = new URLSearchParams(window.location.hash.substring(1)); // For implicit/PKCE hash
-        const errorDescription = params.get('error_description');
-        if (errorDescription) {
-            console.error('Auth Error:', errorDescription);
-            alert(`Login Failed: ${errorDescription}`);
-        }
+            // Check if URL contains auth info
+            const hash = window.location.hash;
+            const search = window.location.search;
+            const hasAuthParams = hash.includes('access_token') ||
+                hash.includes('error_description') ||
+                search.includes('code=');
 
-        // Check active session with a slight delay/retry for Chrome reliability
-        const checkSession = async () => {
+            if (hasAuthParams) {
+                console.log('Auth params detected, processing...');
+                // Wait for Supabase SDK to process the URL
+                await new Promise(res => setTimeout(res, 500));
+            }
+
+            // Check for errors in URL
+            const params = new URLSearchParams(hash.substring(1));
+            const errorDescription = params.get('error_description');
+            if (errorDescription) {
+                console.error('Auth Error:', errorDescription);
+                alert(`Login Failed: ${errorDescription}`);
+            }
+
             const { data: { session } } = await supabase.auth.getSession();
             console.log('Current Session:', session);
             setUser(session?.user ?? null);
         };
 
-        checkSession();
+        handleAuth();
 
         // Listen for auth changes
         const {

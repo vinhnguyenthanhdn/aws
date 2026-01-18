@@ -132,6 +132,13 @@ function App() {
 
     // Update URL when index changes
     useEffect(() => {
+        // Avoid overwriting URL if Auth flow is active
+        const hash = window.location.hash;
+        const search = window.location.search;
+        if (hash.includes('access_token') || hash.includes('type=recovery') || search.includes('code=')) {
+            return;
+        }
+
         const params = new URLSearchParams(window.location.search);
         params.set('q', String(currentIndex + 1));
         window.history.replaceState({}, '', `?${params.toString()}`);
