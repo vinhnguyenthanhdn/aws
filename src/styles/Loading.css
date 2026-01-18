@@ -22,9 +22,29 @@
     }
 }
 
+@keyframes pulse {
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
 .loading-message {
     margin-top: var(--space-lg);
-    color: var(--color-text-secondary);
-    font-size: 1rem;
-    font-weight: 500;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-dark));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    animation: pulse 1.5s ease-in-out infinite;
+    text-align: center;
 }

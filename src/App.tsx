@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
-import { LanguageSelector } from './components/LanguageSelector';
+
 import { QuestionCard } from './components/QuestionCard';
 import { AIContent } from './components/AIContent';
 import { Navigation } from './components/Navigation';
@@ -234,7 +234,7 @@ function App() {
     if (loading) {
         return (
             <div className="app">
-                <Loading message="Loading questions from Supabase..." />
+                <Loading message="Initializing AWS Cloud Learning Environment..." />
             </div>
         );
     }
@@ -259,13 +259,12 @@ function App() {
 
     return (
         <div className="app">
-            <Header />
+            <Header
+                currentLanguage={language}
+                onLanguageChange={handleLanguageChange}
+            />
 
             <main className="container">
-                <LanguageSelector
-                    currentLanguage={language}
-                    onLanguageChange={handleLanguageChange}
-                />
 
                 <QuestionCard
                     question={currentQuestion}
