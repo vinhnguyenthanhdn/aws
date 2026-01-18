@@ -1,0 +1,43 @@
+.navigation {
+    margin: var(--space-xl) 0;
+    padding: var(--space-lg) 0;
+    border-top: 2px solid var(--color-border);
+}
+
+.nav-buttons {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.jump-form {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.jump-input {
+    width: 200px;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .nav-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .nav-buttons>button {
+        width: 100%;
+    }
+
+    .jump-form {
+        width: 100%;
+    }
+
+    .jump-input {
+        flex: 1;
+    }
+}

@@ -1,0 +1,25 @@
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.error-card {
+    text-align: center;
+    padding: var(--space-2xl);
+    margin-top: var(--space-2xl);
+}
+
+.error-card h2 {
+    color: var(--color-error);
+    margin-bottom: var(--space-lg);
+}
+
+.error-card p {
+    color: var(--color-text-secondary);
+    font-size: 1.125rem;
+}
