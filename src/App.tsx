@@ -84,20 +84,24 @@ function App() {
             try {
                 // Check if user manually selected language before (optional, but good UX)
                 // If we want strict IP based on first load:
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
+                // Use api.country.is (free, no key, HTTPS supported)
+                const response = await fetch('https://api.country.is');
+                if (!response.ok) throw new Error('IP API failed');
 
-                // If detected Vietnam, set to 'vi', otherwise default 'en' or keep 'vi' default?
-                // Default state is 'vi'.
-                // If foreign IP, switch to 'en'.
-                console.log('Detected Country:', data.country_code);
-                if (data.country_code !== 'VN') {
-                    setLanguage('en');
-                } else {
-                    setLanguage('vi');
+                const data = await response.json();
+                console.log('Detected Country:', data.country);
+
+                // Only switch if we successfully got a country code
+                if (data.country) {
+                    if (data.country !== 'VN') {
+                        setLanguage('en');
+                    } else {
+                        setLanguage('vi');
+                    }
                 }
             } catch (error) {
                 console.error('Error detecting language:', error);
+                // Keep default 'vi' on error
             }
         };
 
