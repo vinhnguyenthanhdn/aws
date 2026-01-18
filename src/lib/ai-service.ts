@@ -1,7 +1,6 @@
 import { supabase } from './supabase';
 import type { Language } from '../types';
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 
 interface AIResponse {
@@ -14,9 +13,28 @@ interface AIResponse {
     }>;
 }
 
+const getApiKey = () => {
+    // Try to get list of keys first
+    const keysString = import.meta.env.VITE_GOOGLE_API_KEYS || '';
+    const keys = keysString.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
+
+    // Fallback to single key if list is empty
+    if (keys.length === 0) {
+        return import.meta.env.VITE_GEMINI_API_KEY || '';
+    }
+
+    // Return random key from list
+    return keys[Math.floor(Math.random() * keys.length)];
+};
+
 async function callGeminiAPI(prompt: string): Promise<string> {
+    const apiKey = getApiKey();
+    if (!apiKey) {
+        throw new Error('No API Key configured');
+    }
+
     try {
-        const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -31,6 +49,9 @@ async function callGeminiAPI(prompt: string): Promise<string> {
         });
 
         if (!response.ok) {
+            // Check for quota exceeded specifically if we want to be fancy, but simple error throw is fine for now
+            // If we had retry logic with different keys, it would go here. 
+            // For now, let's just throw.
             throw new Error(`API call failed: ${response.statusText}`);
         }
 

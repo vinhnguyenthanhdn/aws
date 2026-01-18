@@ -21,7 +21,7 @@ def get_db_connection():
         return None
 
 def create_table_if_not_exists(conn):
-    schema = """
+    schema_questions = """
     CREATE TABLE IF NOT EXISTS questions (
         id text PRIMARY KEY,
         topic text,
@@ -33,14 +33,31 @@ def create_table_if_not_exists(conn):
         created_at timestamp with time zone DEFAULT now()
     );
     """
+    
+    schema_ai_cache = """
+    CREATE TABLE IF NOT EXISTS ai_cache (
+        id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+        question_id text NOT NULL,
+        language text NOT NULL, 
+        type text NOT NULL CHECK (type IN ('explanation', 'theory')),
+        content text NOT NULL,
+        created_at timestamp with time zone DEFAULT now()
+    );
+    
+    -- Create index for faster lookups
+    CREATE INDEX IF NOT EXISTS idx_ai_cache_lookup 
+    ON ai_cache(question_id, language, type);
+    """
+
     try:
         with conn.cursor() as cur:
-            cur.execute(schema)
+            cur.execute(schema_questions)
+            cur.execute(schema_ai_cache)
         conn.commit()
-        print("✅ Table 'questions' matches schema.")
+        print("✅ Tables 'questions' and 'ai_cache' match schema.")
     except Exception as e:
         conn.rollback()
-        print(f"❌ Error creating table: {e}")
+        print(f"❌ Error creating tables: {e}")
 
 def parse_markdown_file(file_path):
     print(f"📖 Reading file: {file_path}")
