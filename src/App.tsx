@@ -25,16 +25,38 @@ function App() {
     useEffect(() => {
         const loadQuestions = async () => {
             try {
-                // Fetch from Supabase
-                const { data, error } = await supabase
-                    .from('questions')
-                    .select('*')
-                    .range(0, 4999)
-                    .order('id'); // Order by ID string
+                // Fetch from Supabase with pagination to bypass 1000 row limit
+                let allData: any[] = [];
+                let from = 0;
+                const PAGE_SIZE = 1000;
+                let fetchMore = true;
 
-                if (error) {
-                    throw error;
+                while (fetchMore) {
+                    const { data, error } = await supabase
+                        .from('questions')
+                        .select('*')
+                        .range(from, from + PAGE_SIZE - 1)
+                        .order('id');
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    if (data) {
+                        allData = [...allData, ...data];
+
+                        // If we got less than PAGE_SIZE, we've reached the end
+                        if (data.length < PAGE_SIZE) {
+                            fetchMore = false;
+                        } else {
+                            from += PAGE_SIZE;
+                        }
+                    } else {
+                        fetchMore = false;
+                    }
                 }
+
+                const data = allData;
 
                 if (data && data.length > 0) {
                     // Map DB response to Question type
