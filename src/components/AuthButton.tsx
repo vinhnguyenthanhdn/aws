@@ -9,11 +9,22 @@ export const AuthButton: React.FC = () => {
     useEffect(() => {
         console.log('Current URL:', window.location.href);
 
-        // Check active session
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        // Check for errors in URL
+        const params = new URLSearchParams(window.location.hash.substring(1)); // For implicit/PKCE hash
+        const errorDescription = params.get('error_description');
+        if (errorDescription) {
+            console.error('Auth Error:', errorDescription);
+            alert(`Login Failed: ${errorDescription}`);
+        }
+
+        // Check active session with a slight delay/retry for Chrome reliability
+        const checkSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
             console.log('Current Session:', session);
             setUser(session?.user ?? null);
-        });
+        };
+
+        checkSession();
 
         // Listen for auth changes
         const {
@@ -28,7 +39,14 @@ export const AuthButton: React.FC = () => {
 
     const handleLogin = async () => {
         await supabase.auth.signInWithOAuth({
-            provider: 'google'
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin,
+                queryParams: {
+                    access_type: 'offline',
+                    prompt: 'consent',
+                },
+            },
         });
     };
 
