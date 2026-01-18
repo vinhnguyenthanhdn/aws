@@ -29,6 +29,8 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
   }
 }

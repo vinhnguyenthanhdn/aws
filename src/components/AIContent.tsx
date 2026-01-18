@@ -10,6 +10,10 @@ interface AIContentProps {
     discussionLink?: string;
 }
 
+
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 export const AIContent: React.FC<AIContentProps> = ({
     type,
     content,
@@ -24,8 +28,10 @@ export const AIContent: React.FC<AIContentProps> = ({
             <div className="ai-content-header">
                 <h3>{title}</h3>
             </div>
-            <div className="ai-content-body">
-                <p>{content}</p>
+            <div className="ai-content-body markdown-body">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {content}
+                </ReactMarkdown>
             </div>
             {discussionLink && type === 'explanation' && (
                 <div className="ai-content-footer">
