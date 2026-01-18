@@ -4,19 +4,11 @@
     padding: var(--space-2xl) 0;
     margin-bottom: var(--space-2xl);
     box-shadow: var(--shadow-lg);
+    position: relative;
 }
 
 .header-content {
     text-align: center;
-    position: relative;
-    /* For absolute positioning of actions */
-}
-
-.header-actions {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
 }
 
 .app-title {
