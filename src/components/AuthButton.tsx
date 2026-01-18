@@ -7,6 +7,8 @@ export const AuthButton: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
+        console.log('Current URL:', window.location.href);
+
         // Check active session
         supabase.auth.getSession().then(({ data: { session } }) => {
             console.log('Current Session:', session);
@@ -26,12 +28,7 @@ export const AuthButton: React.FC = () => {
 
     const handleLogin = async () => {
         await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: import.meta.env.PROD
-                    ? 'https://quizz-aws.vercel.app'
-                    : window.location.origin
-            }
+            provider: 'google'
         });
     };
 
