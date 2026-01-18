@@ -29,6 +29,7 @@ function App() {
                 const { data, error } = await supabase
                     .from('questions')
                     .select('*')
+                    .range(0, 4999)
                     .order('id'); // Order by ID string
 
                 if (error) {
@@ -89,8 +90,11 @@ function App() {
                 // If detected Vietnam, set to 'vi', otherwise default 'en' or keep 'vi' default?
                 // Default state is 'vi'.
                 // If foreign IP, switch to 'en'.
+                console.log('Detected Country:', data.country_code);
                 if (data.country_code !== 'VN') {
                     setLanguage('en');
+                } else {
+                    setLanguage('vi');
                 }
             } catch (error) {
                 console.error('Error detecting language:', error);

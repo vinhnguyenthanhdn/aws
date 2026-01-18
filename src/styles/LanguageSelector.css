@@ -1,10 +1,9 @@
 .language-selector {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
     display: flex;
     gap: var(--space-sm);
-    z-index: 1000;
+    justify-content: flex-end;
+    /* Align right */
+    margin-bottom: var(--space-lg);
 }
 
 .lang-btn {
