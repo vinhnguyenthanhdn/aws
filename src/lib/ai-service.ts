@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import type { Language } from '../types';
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent';
 
 interface AIResponse {
     candidates: Array<{
@@ -75,7 +75,7 @@ async function getCachedAIContent(
             .eq('question_id', questionId)
             .eq('language', language)
             .eq('type', type)
-            .single();
+            .maybeSingle();
 
         if (error || !data) return null;
         return data.content;
