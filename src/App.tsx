@@ -77,6 +77,29 @@ function App() {
         loadQuestions();
     }, []);
 
+    // Auto-detect language based on IP
+    useEffect(() => {
+        const detectLanguage = async () => {
+            try {
+                // Check if user manually selected language before (optional, but good UX)
+                // If we want strict IP based on first load:
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+
+                // If detected Vietnam, set to 'vi', otherwise default 'en' or keep 'vi' default?
+                // Default state is 'vi'.
+                // If foreign IP, switch to 'en'.
+                if (data.country_code !== 'VN') {
+                    setLanguage('en');
+                }
+            } catch (error) {
+                console.error('Error detecting language:', error);
+            }
+        };
+
+        detectLanguage();
+    }, []);
+
     // Update URL when index changes
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
