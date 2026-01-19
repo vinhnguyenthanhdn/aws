@@ -30,3 +30,12 @@ export interface AppState {
     language: Language;
     activeAISection: 'theory' | 'explanation' | null;
 }
+
+export interface UserSubmission {
+    id: string;
+    question_id: string;
+    answer: string;
+    is_correct: boolean;
+    created_at: string;
+    question?: Question; // Optional for joining data
+}

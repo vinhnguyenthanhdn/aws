@@ -9,6 +9,8 @@ import { Loading } from './components/Loading';
 import { supabase } from './lib/supabase';
 import { getAIExplanation, getAITheory } from './lib/ai-service';
 import { saveUserProgress, getUserProgress } from './lib/user-service';
+import { saveUserSubmission } from './lib/history-service';
+import { HistoryPage } from './components/HistoryPage';
 import type { User } from '@supabase/supabase-js';
 import type { Question, Language } from './types';
 import './styles/App.css';
@@ -25,6 +27,7 @@ function App() {
     const [user, setUser] = useState<User | null>(null);
     const [isRestoringProgress, setIsRestoringProgress] = useState(true);
     const [pendingSavedIndex, setPendingSavedIndex] = useState<number | null>(null);
+    const [view, setView] = useState<'quiz' | 'history'>('quiz');
 
     // Load questions on mount
     useEffect(() => {
@@ -218,10 +221,20 @@ function App() {
     const currentQuestion = questions[currentIndex];
 
     const handleSubmitAnswer = (answer: string) => {
+        const isCorrect = answer === currentQuestion.correct_answer;
+
         setUserAnswers(prev => ({
             ...prev,
             [currentQuestion.id]: answer,
         }));
+
+        // Reset AI section explanation/theory to null when new answer is submitted? 
+        // Or keep it? Usually better to keep if user wants to see it.
+
+        // Save submission history if logged in
+        if (user) {
+            saveUserSubmission(user.id, currentQuestion.id, answer, isCorrect);
+        }
     };
 
     const handleLanguageChange = (newLanguage: Language) => {
@@ -317,6 +330,8 @@ function App() {
     const handleJumpToQuestion = (index: number) => {
         if (index >= 0 && index < questions.length) {
             setCurrentIndex(index);
+            setView('quiz'); // Switch back to quiz view
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
@@ -351,49 +366,61 @@ function App() {
             <Header
                 currentLanguage={language}
                 onLanguageChange={handleLanguageChange}
+                onHistoryClick={() => setView(v => v === 'quiz' ? 'history' : 'quiz')}
+                isHistoryView={view === 'history'}
+                user={user}
             />
 
             <main className="container">
-
-                <QuestionCard
-                    question={currentQuestion}
-                    questionNumber={currentIndex + 1}
-                    totalQuestions={questions.length}
-                    language={language}
-                    userAnswer={userAnswers[currentQuestion.id]}
-                    onSubmit={handleSubmitAnswer}
-                    onRequestTheory={handleRequestTheory}
-                    onRequestExplanation={handleRequestExplanation}
-                    loadingAction={aiLoading ? activeAISection : null}
-                />
-
-                {aiLoading && <Loading message="AI is thinking..." />}
-
-                {!aiLoading && activeAISection === 'theory' && aiContent[theoryCacheKey] && (
-                    <AIContent
-                        type="theory"
-                        content={aiContent[theoryCacheKey]}
-                        language={language}
+                {view === 'history' && user ? (
+                    <HistoryPage
+                        userId={user.id}
+                        questions={questions}
+                        onJumpToQuestion={handleJumpToQuestion}
                     />
-                )}
+                ) : (
+                    <>
+                        <QuestionCard
+                            question={currentQuestion}
+                            questionNumber={currentIndex + 1}
+                            totalQuestions={questions.length}
+                            language={language}
+                            userAnswer={userAnswers[currentQuestion.id]}
+                            onSubmit={handleSubmitAnswer}
+                            onRequestTheory={handleRequestTheory}
+                            onRequestExplanation={handleRequestExplanation}
+                            loadingAction={aiLoading ? activeAISection : null}
+                        />
 
-                {!aiLoading && activeAISection === 'explanation' && aiContent[explanationCacheKey] && (
-                    <AIContent
-                        type="explanation"
-                        content={aiContent[explanationCacheKey]}
-                        language={language}
-                        discussionLink={currentQuestion.discussion_link}
-                    />
-                )}
+                        {aiLoading && <Loading message="AI is thinking..." />}
 
-                <Navigation
-                    currentIndex={currentIndex}
-                    totalQuestions={questions.length}
-                    language={language}
-                    onPrevious={handlePrevious}
-                    onNext={handleNext}
-                    onJumpToQuestion={handleJumpToQuestion}
-                />
+                        {!aiLoading && activeAISection === 'theory' && aiContent[theoryCacheKey] && (
+                            <AIContent
+                                type="theory"
+                                content={aiContent[theoryCacheKey]}
+                                language={language}
+                            />
+                        )}
+
+                        {!aiLoading && activeAISection === 'explanation' && aiContent[explanationCacheKey] && (
+                            <AIContent
+                                type="explanation"
+                                content={aiContent[explanationCacheKey]}
+                                language={language}
+                                discussionLink={currentQuestion.discussion_link}
+                            />
+                        )}
+
+                        <Navigation
+                            currentIndex={currentIndex}
+                            totalQuestions={questions.length}
+                            language={language}
+                            onPrevious={handlePrevious}
+                            onNext={handleNext}
+                            onJumpToQuestion={handleJumpToQuestion}
+                        />
+                    </>
+                )}
             </main>
 
             <Footer />

@@ -1,0 +1,136 @@
+.history-page {
+    padding: 2rem 0;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.history-stats {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.clear-history-btn {
+    background-color: var(--error);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: opacity 0.2s;
+}
+
+.clear-history-btn:hover {
+    opacity: 0.9;
+}
+
+.history-group {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+}
+
+.group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.question-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.jump-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    margin-left: 1rem;
+}
+
+.submissions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.submission-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem;
+    border-radius: 8px;
+    background: var(--background);
+    border-left: 4px solid transparent;
+}
+
+.submission-item.correct {
+    border-left-color: var(--success);
+    background: rgba(var(--success-rgb), 0.05);
+}
+
+.submission-item.incorrect {
+    border-left-color: var(--error);
+    background: rgba(var(--error-rgb), 0.05);
+}
+
+.submission-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.submission-answer {
+    font-weight: 500;
+    font-family: monospace;
+}
+
+.submission-time {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.status-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-badge.correct {
+    background-color: rgba(var(--success-rgb), 0.1);
+    color: var(--success);
+}
+
+.status-badge.incorrect {
+    background-color: rgba(var(--error-rgb), 0.1);
+    color: var(--error);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+}

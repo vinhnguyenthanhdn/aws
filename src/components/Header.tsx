@@ -7,14 +7,42 @@ import '../styles/Header.css';
 interface HeaderProps {
     currentLanguage: Language;
     onLanguageChange: (language: Language) => void;
+    onHistoryClick?: () => void;
+    isHistoryView?: boolean;
+    user?: any;
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentLanguage, onLanguageChange }) => {
+export const Header: React.FC<HeaderProps> = ({
+    currentLanguage,
+    onLanguageChange,
+    onHistoryClick,
+    isHistoryView,
+    user
+}) => {
     return (
         <header className="app-header">
             <div className="container">
                 <div className="header-content">
-                    <AuthButton currentLanguage={currentLanguage} />
+                    <div className="header-actions">
+                        <AuthButton currentLanguage={currentLanguage} />
+                        {user && onHistoryClick && (
+                            <button
+                                className={`btn-history ${isHistoryView ? 'active' : ''}`}
+                                onClick={onHistoryClick}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '6px',
+                                    border: '1px solid var(--border)',
+                                    background: isHistoryView ? 'var(--primary)' : 'var(--surface)',
+                                    color: isHistoryView ? 'white' : 'var(--text-primary)',
+                                    cursor: 'pointer',
+                                    marginLeft: '1rem'
+                                }}
+                            >
+                                {isHistoryView ? 'Back to Quiz' : 'My History'}
+                            </button>
+                        )}
+                    </div>
                     <LanguageSelector
                         currentLanguage={currentLanguage}
                         onLanguageChange={onLanguageChange}
