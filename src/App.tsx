@@ -24,6 +24,7 @@ function App() {
     const [aiContent, setAiContent] = useState<Record<string, string>>({});
     const [user, setUser] = useState<User | null>(null);
     const [isRestoringProgress, setIsRestoringProgress] = useState(true);
+    const [pendingSavedIndex, setPendingSavedIndex] = useState<number | null>(null);
 
     // Load questions on mount
     useEffect(() => {
@@ -83,16 +84,6 @@ function App() {
                     if (savedAnswers) {
                         setUserAnswers(JSON.parse(savedAnswers));
                     }
-
-                    // Load saved index from URL
-                    const params = new URLSearchParams(window.location.search);
-                    const qParam = params.get('q');
-                    if (qParam) {
-                        const index = parseInt(qParam) - 1;
-                        if (index >= 0 && index < mappedQuestions.length) {
-                            setCurrentIndex(index);
-                        }
-                    }
                 }
             } catch (error) {
                 console.error('Error loading questions:', error);
@@ -140,25 +131,10 @@ function App() {
             setUser(session?.user ?? null);
 
             if (session?.user) {
-                console.log('User logged in:', session.user.id);
                 const savedIndex = await getUserProgress(session.user.id);
-                console.log('Retrieved saved progress:', savedIndex);
 
                 if (savedIndex !== null) {
-                    // Start restoring
-                    const params = new URLSearchParams(window.location.search);
-                    const qParam = params.get('q');
-                    console.log('Current URL q param:', qParam);
-
-                    // Restore ONLY if there is no explicit Q param in the initial URL
-                    // Note: This logic assumes that if we handle this fast enough, the URL Update effect hasn't run yet
-                    // OR we check against our own default injection. 
-                    if (!qParam) {
-                        console.log('Restoring progress to index:', savedIndex);
-                        setCurrentIndex(savedIndex);
-                    } else {
-                        console.log('Ignoring saved progress due to URL param');
-                    }
+                    setPendingSavedIndex(savedIndex);
                 }
             }
             // Done checking auth/progress
@@ -181,12 +157,35 @@ function App() {
         });
 
         return () => subscription.unsubscribe();
-    }, []); // Run once on mount due to isRestoringProgress ref check logic inside? No, dependency empty.
+    }, []); // Run once on mount
+
+    // Determine Initial Index (Priority: Saved > URL)
+    useEffect(() => {
+        if (loading || isRestoringProgress) return;
+
+        // If we have a saved index, use it (User Request: "nếu đã lưu... mở ra câu đó")
+        if (pendingSavedIndex !== null) {
+            if (pendingSavedIndex >= 0 && pendingSavedIndex < questions.length) {
+                setCurrentIndex(pendingSavedIndex);
+                return;
+            }
+        }
+
+        // If no saved index, check URL (User Request: "nếu chưa lưu thì mở câu hỏi xx")
+        const params = new URLSearchParams(window.location.search);
+        const qParam = params.get('q');
+        if (qParam) {
+            const index = parseInt(qParam) - 1;
+            if (index >= 0 && index < questions.length) {
+                setCurrentIndex(index);
+            }
+        }
+    }, [loading, isRestoringProgress, pendingSavedIndex, questions]);
 
     // Update URL & Save Progress when index changes
     useEffect(() => {
         // Don't update URL if we are still determining start index
-        if (isRestoringProgress) return;
+        if (isRestoringProgress || loading) return;
 
         // Avoid overwriting URL if Auth flow is active
         const hash = window.location.hash;
@@ -209,7 +208,7 @@ function App() {
         if (user) {
             saveUserProgress(user.id, currentIndex);
         }
-    }, [currentIndex, user, isRestoringProgress]);
+    }, [currentIndex, user, isRestoringProgress, loading]);
 
     // Save answers to localStorage
     useEffect(() => {

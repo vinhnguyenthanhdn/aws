@@ -2,7 +2,6 @@ import { supabase } from './supabase';
 
 export async function saveUserProgress(userId: string, index: number) {
     try {
-        console.log('Saving progress for user:', userId, 'Index:', index);
         const { error } = await supabase
             .from('user_progress')
             .upsert({
@@ -12,7 +11,6 @@ export async function saveUserProgress(userId: string, index: number) {
             }, { onConflict: 'user_id' });
 
         if (error) throw error;
-        console.log('Progress saved successfully');
     } catch (error) {
         console.error('Error saving user progress:', error);
     }
@@ -20,7 +18,6 @@ export async function saveUserProgress(userId: string, index: number) {
 
 export async function getUserProgress(userId: string): Promise<number | null> {
     try {
-        console.log('Fetching progress for user:', userId);
         const { data, error } = await supabase
             .from('user_progress')
             .select('last_question_index')
@@ -29,14 +26,12 @@ export async function getUserProgress(userId: string): Promise<number | null> {
 
         if (error) {
             if (error.code === 'PGRST116') {
-                console.log('No progress found for user (PGRST116)');
                 return null;
             }
             console.error('Supabase error fetching progress:', error);
             throw error;
         }
 
-        console.log('Progress data from Supabase:', data);
         return data?.last_question_index ?? null;
     } catch (error) {
         console.error('Error getting user progress:', error);
