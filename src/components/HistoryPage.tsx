@@ -52,12 +52,18 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
     });
 
     if (loading) {
-        return <div className="history-page"><div className="loading">Loading history...</div></div>;
+        return (
+            <div className="history-page">
+                <div className="loading-container" style={{ textAlign: 'center', padding: '3rem' }}>
+                    Loading history...
+                </div>
+            </div>
+        );
     }
 
     if (submissions.length === 0) {
         return (
-            <div className="history-page">
+            <div className="history-page fade-in">
                 <div className="empty-state">
                     <h3>No history found</h3>
                     <p>Start answering questions to see your progress here!</p>
@@ -68,20 +74,29 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
 
     return (
         <div className="history-page fade-in">
+            {/* Header Section */}
             <div className="history-header">
-                <div>
-                    <h2>Submission History</h2>
+                <div className="header-left">
+                    <h2 className="history-title">Submission History</h2>
                     <div className="history-stats">
-                        <span><strong>{submissions.length}</strong> Total Submissions</span>
-                        <span>•</span>
-                        <span><strong>{Object.keys(groupedSubmissions).length}</strong> Questions Attempted</span>
+                        <span className="stat-item">
+                            <strong>{submissions.length}</strong> Total Submissions
+                        </span>
+                        <span className="stat-divider">•</span>
+                        <span className="stat-item">
+                            <strong>{Object.keys(groupedSubmissions).length}</strong> Questions Attempted
+                        </span>
                     </div>
                 </div>
-                <button onClick={handleClearHistory} className="btn btn-error btn-sm">
+                <button
+                    onClick={handleClearHistory}
+                    className="btn-clear-history"
+                >
                     Clear History
                 </button>
             </div>
 
+            {/* List Section */}
             <div className="history-list">
                 {sortedGroups.map(([questionId, groupSubs]) => {
                     const question = questions.find(q => q.id === questionId);
@@ -92,41 +107,59 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
                     return (
                         <div key={questionId} className="history-group">
                             <div className="group-header">
-                                <div style={{ flex: 1 }}>
-                                    <div className="question-title">
-                                        Question {questionIndex + 1}: {question.question.substring(0, 120)}...
+                                <div className="question-info">
+                                    <div className="question-identifier">
+                                        Question {questionIndex + 1}: {question.id}
                                     </div>
-                                    <div className="question-meta">
-                                        ID: {questionId}
+                                    <div className="question-text-preview">
+                                        {question.question}
                                     </div>
                                 </div>
                                 <button
-                                    className="btn btn-primary btn-sm"
+                                    className="btn-jump"
                                     onClick={() => onJumpToQuestion(questionIndex)}
-                                    style={{ marginLeft: '1rem' }}
                                 >
                                     Jump to Question
                                 </button>
                             </div>
 
                             <div className="submissions-list">
-                                {groupSubs.map((sub, idx) => (
-                                    <div
-                                        key={sub.id}
-                                        className={`submission-item ${sub.is_correct ? 'correct' : 'incorrect'}`}
-                                    >
-                                        <div className="submission-info">
-                                            <span style={{ fontWeight: 'bold', width: '2rem' }}>#{groupSubs.length - idx}</span>
-                                            <div className={`status-badge ${sub.is_correct ? 'correct' : 'incorrect'}`}>
-                                                {sub.is_correct ? 'Correct' : 'Incorrect'}
+                                {groupSubs.map((sub, idx) => {
+                                    const submissionDate = new Date(sub.created_at);
+                                    const formattedDate = submissionDate.toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric'
+                                    });
+                                    const formattedTime = submissionDate.toLocaleTimeString('en-US', {
+                                        hour: 'numeric',
+                                        minute: '2-digit',
+                                        hour12: true
+                                    });
+
+                                    return (
+                                        <div key={sub.id} className="submission-menu-item">
+                                            <div className="submission-header">
+                                                <div className="attempt-badge">
+                                                    #{groupSubs.length - idx}
+                                                </div>
+                                                <div className={`status-badge ${sub.is_correct ? 'correct' : 'incorrect'}`}>
+                                                    {sub.is_correct ? 'CORRECT' : 'INCORRECT'}
+                                                </div>
                                             </div>
-                                            <span className="submission-answer">You chose: {sub.answer}</span>
+
+                                            <div className="submission-body">
+                                                <div className="answer-display">
+                                                    You chose: <strong>{sub.answer}</strong>
+                                                </div>
+                                                <div className="submission-meta">
+                                                    <span className="date">{formattedDate}</span>
+                                                    <span className="time">{formattedTime}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <span className="submission-time">
-                                            {new Date(sub.created_at).toLocaleString()}
-                                        </span>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     );

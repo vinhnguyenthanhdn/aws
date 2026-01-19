@@ -236,6 +236,8 @@ function App() {
         // Save submission history if logged in
         if (user) {
             saveUserSubmission(user.id, currentQuestion.id, answer, isCorrect);
+            // Also save progress on submit
+            saveUserProgress(user.id, currentIndex);
         }
     };
 
@@ -248,6 +250,11 @@ function App() {
 
     const handleRequestTheory = async () => {
         if (!currentQuestion || aiLoading) return;
+
+        // Save progress when user engages with AI
+        if (user) {
+            saveUserProgress(user.id, currentIndex);
+        }
 
         const cacheKey = `theory_${currentQuestion.id}_${language}`;
 
@@ -283,6 +290,11 @@ function App() {
 
     const handleRequestExplanation = async () => {
         if (!currentQuestion || aiLoading) return;
+
+        // Save progress when user engages with AI
+        if (user) {
+            saveUserProgress(user.id, currentIndex);
+        }
 
         const cacheKey = `explanation_${currentQuestion.id}_${language}`;
 
