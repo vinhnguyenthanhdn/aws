@@ -139,18 +139,20 @@ function App() {
             setUser(session?.user ?? null);
 
             if (session?.user) {
+                console.log('User logged in:', session.user.id);
                 const savedIndex = await getUserProgress(session.user.id);
+                console.log('Retrieved saved progress:', savedIndex);
+
                 if (savedIndex !== null) {
-                    // Only restore progress if NO 'q' param is present in URL
-                    // This allows sharing specific questions via link
                     const params = new URLSearchParams(window.location.search);
-                    if (!params.get('q')) {
-                        // Ensure index is valid within current questions range if loaded
-                        // Since questions might load AFTER auth, we might just set it and let UI handle bounds or wait?
-                        // Ideally we want to set it. Questions check bounds in render.
-                        // But we better check against questions.length if possible, but questions might be empty initially.
-                        // We'll trust the saved index for now, or check bounds in render.
+                    const qParam = params.get('q');
+                    console.log('Current URL q param:', qParam);
+
+                    if (!qParam) {
+                        console.log('Restoring progress to index:', savedIndex);
                         setCurrentIndex(savedIndex);
+                    } else {
+                        console.log('Ignoring saved progress due to URL param');
                     }
                 }
             }

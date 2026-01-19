@@ -18,6 +18,7 @@ export async function saveUserProgress(userId: string, index: number) {
 
 export async function getUserProgress(userId: string): Promise<number | null> {
     try {
+        console.log('Fetching progress for user:', userId);
         const { data, error } = await supabase
             .from('user_progress')
             .select('last_question_index')
@@ -25,10 +26,15 @@ export async function getUserProgress(userId: string): Promise<number | null> {
             .single();
 
         if (error) {
-            if (error.code === 'PGRST116') return null; // Not found code
+            if (error.code === 'PGRST116') {
+                console.log('No progress found for user (PGRST116)');
+                return null;
+            }
+            console.error('Supabase error fetching progress:', error);
             throw error;
         }
 
+        console.log('Progress data from Supabase:', data);
         return data?.last_question_index ?? null;
     } catch (error) {
         console.error('Error getting user progress:', error);
