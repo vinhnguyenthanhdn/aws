@@ -99,6 +99,23 @@ export interface Database {
                     created_at?: string;
                 };
             };
+            user_progress: {
+                Row: {
+                    user_id: string;
+                    last_question_index: number;
+                    updated_at: string;
+                };
+                Insert: {
+                    user_id: string;
+                    last_question_index: number;
+                    updated_at?: string;
+                };
+                Update: {
+                    user_id?: string;
+                    last_question_index?: number;
+                    updated_at?: string;
+                };
+            };
         };
     };
 }

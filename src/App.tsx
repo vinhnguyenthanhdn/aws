@@ -8,6 +8,8 @@ import { Navigation } from './components/Navigation';
 import { Loading } from './components/Loading';
 import { supabase } from './lib/supabase';
 import { getAIExplanation, getAITheory } from './lib/ai-service';
+import { saveUserProgress, getUserProgress } from './lib/user-service';
+import type { User } from '@supabase/supabase-js';
 import type { Question, Language } from './types';
 import './styles/App.css';
 
@@ -20,6 +22,7 @@ function App() {
     const [aiLoading, setAiLoading] = useState(false);
     const [activeAISection, setActiveAISection] = useState<'theory' | 'explanation' | null>(null);
     const [aiContent, setAiContent] = useState<Record<string, string>>({});
+    const [user, setUser] = useState<User | null>(null);
 
     // Load questions on mount
     useEffect(() => {
@@ -130,7 +133,41 @@ function App() {
         detectLanguage();
     }, []);
 
-    // Update URL when index changes
+    // Monitor Auth State & Load Progress
+    useEffect(() => {
+        const handleAuthChange = async (session: any) => {
+            setUser(session?.user ?? null);
+
+            if (session?.user) {
+                const savedIndex = await getUserProgress(session.user.id);
+                if (savedIndex !== null) {
+                    // Only restore progress if NO 'q' param is present in URL
+                    // This allows sharing specific questions via link
+                    const params = new URLSearchParams(window.location.search);
+                    if (!params.get('q')) {
+                        // Ensure index is valid within current questions range if loaded
+                        // Since questions might load AFTER auth, we might just set it and let UI handle bounds or wait?
+                        // Ideally we want to set it. Questions check bounds in render.
+                        // But we better check against questions.length if possible, but questions might be empty initially.
+                        // We'll trust the saved index for now, or check bounds in render.
+                        setCurrentIndex(savedIndex);
+                    }
+                }
+            }
+        };
+
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            handleAuthChange(session);
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            handleAuthChange(session);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []); // Run once on mount
+
+    // Update URL & Save Progress when index changes
     useEffect(() => {
         // Avoid overwriting URL if Auth flow is active
         const hash = window.location.hash;
@@ -148,7 +185,14 @@ function App() {
 
         // Reset AI section when changing questions
         setActiveAISection(null);
-    }, [currentIndex]);
+
+        // Save progress if logged in
+        if (user) {
+            // Debouncing could be good here, but for now direct save is simple.
+            // Since this effect runs on every question change, it's consistent.
+            saveUserProgress(user.id, currentIndex);
+        }
+    }, [currentIndex, user]);
 
     // Save answers to localStorage
     useEffect(() => {
