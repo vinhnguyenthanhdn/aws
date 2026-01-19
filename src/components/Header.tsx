@@ -23,18 +23,35 @@ export const Header: React.FC<HeaderProps> = ({
         <header className="app-header">
             <div className="container">
                 <div className="header-content">
-                    <div className="header-actions">
-                        <AuthButton currentLanguage={currentLanguage} />
-                        {user && onHistoryClick && (
+                    <AuthButton currentLanguage={currentLanguage} />
+
+                    {user && onHistoryClick && (
+                        <div className="history-actions">
                             <button
-                                className={`btn ${isHistoryView ? 'btn-primary' : 'btn-secondary'}`}
+                                className={`btn-history ${isHistoryView ? 'active' : ''}`}
                                 onClick={onHistoryClick}
-                                style={{ marginLeft: '1rem' }}
                             >
-                                {isHistoryView ? 'Back to Quiz' : 'My History'}
+                                {isHistoryView ? (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                                            <polyline points="12 19 5 12 12 5"></polyline>
+                                        </svg>
+                                        Back to Quiz
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg>
+                                        My History
+                                    </>
+                                )}
                             </button>
-                        )}
-                    </div>
+                        </div>
+                    )}
+
                     <LanguageSelector
                         currentLanguage={currentLanguage}
                         onLanguageChange={onLanguageChange}
