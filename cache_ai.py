@@ -83,7 +83,7 @@ def get_explanation_prompt(question: str, options: str, correct_answer: str, lan
     """Tạo prompt cho Giải thích (Explanation)"""
     language_instruction = 'Vui lòng trả lời bằng tiếng Việt.' if language == 'vi' else 'Please respond in English.'
     
-    return f"""You are an AWS Solutions Architect expert. Explain why the correct answer is right for this question.
+    return f"""You are an AWS Solutions Architect expert helping students prepare for the SAA-C03 exam.
 
 Question: {question}
 
@@ -94,19 +94,26 @@ Correct Answer: {correct_answer}
 
 {language_instruction}
 
-Provide a clear, detailed explanation focusing on:
-1. Why the correct answer is right
-2. Key AWS concepts involved
-3. Common pitfalls to avoid
+Provide a comprehensive explanation covering:
 
-Keep the explanation concise but informative (max 300 words)."""
+1. **Giải thích câu hỏi**: Phân tích yêu cầu chính của câu hỏi, xác định các điểm mấu chốt cần chú ý.
+
+2. **Giải thích đáp án đúng**: Tại sao đáp án {correct_answer} là đúng? Giải thích chi tiết cách nó đáp ứng yêu cầu của câu hỏi.
+
+3. **Tại sao không chọn các đáp án khác**: Phân tích từng đáp án sai, giải thích lý do tại sao chúng không phù hợp hoặc không tối ưu.
+
+4. **Các lỗi thường gặp (Common Mistakes)**: Liệt kê các lỗi mà thí sinh hay mắc phải khi gặp dạng câu hỏi này.
+
+5. **Mẹo để nhớ (Tips to Remember)**: Cung cấp các mẹo, tricks hoặc cách nhớ nhanh để áp dụng cho các câu hỏi tương tự.
+
+Keep the explanation structured and easy to understand (max 500 words)."""
 
 
 def get_theory_prompt(question: str, options: str, language: str) -> str:
     """Tạo prompt cho Lý Thuyết (Theory)"""
     language_instruction = 'Vui lòng trả lời bằng tiếng Việt.' if language == 'vi' else 'Please respond in English.'
     
-    return f"""You are an AWS Solutions Architect expert. Provide theoretical background for understanding this question.
+    return f"""You are an AWS Solutions Architect expert. Provide theoretical foundation for understanding this question.
 
 Question: {question}
 
@@ -115,13 +122,13 @@ Options:
 
 {language_instruction}
 
-Provide:
-1. Key AWS services/concepts mentioned
-2. Important theoretical background
-3. Best practices related to this topic
-4. Helpful tips for the exam
+Provide a comprehensive theoretical breakdown:
 
-Keep the theory concise but comprehensive (max 400 words)."""
+1. **Cơ sở lý thuyết các thuật ngữ trong câu hỏi**: Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật được đề cập trong câu hỏi. Mỗi thuật ngữ cần được giải thích ngắn gọn nhưng đầy đủ.
+
+2. **Cơ sở lý thuyết các thuật ngữ trong đáp án**: Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật xuất hiện trong các đáp án (A, B, C, D). Đặc biệt chú ý những thuật ngữ khác với phần câu hỏi.
+
+Keep the theory organized and easy to reference (max 500 words)."""
 
 
 def call_gemini(prompt: str, max_retries: int = 3) -> Optional[str]:

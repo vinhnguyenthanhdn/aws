@@ -88,7 +88,7 @@ export async function getAIExplanation(
         ? 'Vui lòng trả lời bằng tiếng Việt.'
         : 'Please respond in English.';
 
-    const prompt = `You are an AWS Solutions Architect expert. Explain why the correct answer is right for this question.
+    const prompt = `You are an AWS Solutions Architect expert helping students prepare for the SAA-C03 exam.
 
 Question: ${question}
 
@@ -99,12 +99,19 @@ Correct Answer: ${correctAnswer}
 
 ${languageInstruction}
 
-Provide a clear, detailed explanation focusing on:
-1. Why the correct answer is right
-2. Key AWS concepts involved
-3. Common pitfalls to avoid
+Provide a comprehensive explanation covering:
 
-Keep the explanation concise but informative (max 300 words).`;
+1. **Giải thích câu hỏi**: Phân tích yêu cầu chính của câu hỏi, xác định các điểm mấu chốt cần chú ý.
+
+2. **Giải thích đáp án đúng**: Tại sao đáp án ${correctAnswer} là đúng? Giải thích chi tiết cách nó đáp ứng yêu cầu của câu hỏi.
+
+3. **Tại sao không chọn các đáp án khác**: Phân tích từng đáp án sai, giải thích lý do tại sao chúng không phù hợp hoặc không tối ưu.
+
+4. **Các lỗi thường gặp (Common Mistakes)**: Liệt kê các lỗi mà thí sinh hay mắc phải khi gặp dạng câu hỏi này.
+
+5. **Mẹo để nhớ (Tips to Remember)**: Cung cấp các mẹo, tricks hoặc cách nhớ nhanh để áp dụng cho các câu hỏi tương tự.
+
+Keep the explanation structured and easy to understand (max 500 words).`;
 
     const content = await callGeminiAPI(prompt);
 
@@ -128,7 +135,7 @@ export async function getAITheory(
         ? 'Vui lòng trả lời bằng tiếng Việt.'
         : 'Please respond in English.';
 
-    const prompt = `You are an AWS Solutions Architect expert. Provide theoretical background for understanding this question.
+    const prompt = `You are an AWS Solutions Architect expert. Provide theoretical foundation for understanding this question.
 
 Question: ${question}
 
@@ -137,13 +144,13 @@ ${options}
 
 ${languageInstruction}
 
-Provide:
-1. Key AWS services/concepts mentioned
-2. Important theoretical background
-3. Best practices related to this topic
-4. Helpful tips for the exam
+Provide a comprehensive theoretical breakdown:
 
-Keep the theory concise but comprehensive (max 400 words).`;
+1. **Cơ sở lý thuyết các thuật ngữ trong câu hỏi**: Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật được đề cập trong câu hỏi. Mỗi thuật ngữ cần được giải thích ngắn gọn nhưng đầy đủ.
+
+2. **Cơ sở lý thuyết các thuật ngữ trong đáp án**: Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật xuất hiện trong các đáp án (A, B, C, D). Đặc biệt chú ý những thuật ngữ khác với phần câu hỏi.
+
+Keep the theory organized and easy to reference (max 500 words).`;
 
     const content = await callGeminiAPI(prompt);
 
