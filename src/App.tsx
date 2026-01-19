@@ -163,29 +163,32 @@ function App() {
     }, []); // Run once on mount
 
     // Determine Initial Index (Priority: Saved > URL)
+    // Determine Initial Index (Priority: URL > Saved)
     useEffect(() => {
         if (loading || isRestoringProgress) return;
 
-        // If we have a saved index, use it (User Request: "nếu đã lưu... mở ra câu đó")
-        if (pendingSavedIndex !== null) {
-            if (pendingSavedIndex >= 0 && pendingSavedIndex < questions.length) {
-                setCurrentIndex(pendingSavedIndex);
-                return;
-            }
-        }
-
-        // If no saved index, check URL (User Request: "nếu chưa lưu thì mở câu hỏi xx")
+        // Check URL first (User Request: Link overrides saved state for VIEWING)
         const params = new URLSearchParams(window.location.search);
         const qParam = params.get('q');
         if (qParam) {
             const index = parseInt(qParam) - 1;
             if (index >= 0 && index < questions.length) {
                 setCurrentIndex(index);
+                return;
+            }
+        }
+
+        // If no URL param, fall back to saved index
+        if (pendingSavedIndex !== null) {
+            if (pendingSavedIndex >= 0 && pendingSavedIndex < questions.length) {
+                setCurrentIndex(pendingSavedIndex);
+                return;
             }
         }
     }, [loading, isRestoringProgress, pendingSavedIndex, questions]);
 
     // Update URL & Save Progress when index changes
+    // Update URL when index changes
     useEffect(() => {
         // Don't update URL if we are still determining start index
         if (isRestoringProgress || loading) return;
@@ -207,11 +210,10 @@ function App() {
         // Reset AI section when changing questions
         setActiveAISection(null);
 
-        // Save progress if logged in
-        if (user) {
-            saveUserProgress(user.id, currentIndex);
-        }
-    }, [currentIndex, user, isRestoringProgress, loading]);
+        // NOTE: We do NOT auto-save progress here anymore. 
+        // We only save when user explicitly Navigates (Next/Prev/Jump) or Submits.
+        // This prevents overwriting history when just visiting a link.
+    }, [currentIndex, isRestoringProgress, loading]);
 
     // Save answers to localStorage
     useEffect(() => {
@@ -317,19 +319,24 @@ function App() {
 
     const handlePrevious = () => {
         if (currentIndex > 0) {
-            setCurrentIndex(currentIndex - 1);
+            const newIndex = currentIndex - 1;
+            setCurrentIndex(newIndex);
+            if (user) saveUserProgress(user.id, newIndex);
         }
     };
 
     const handleNext = () => {
         if (currentIndex < questions.length - 1) {
-            setCurrentIndex(currentIndex + 1);
+            const newIndex = currentIndex + 1;
+            setCurrentIndex(newIndex);
+            if (user) saveUserProgress(user.id, newIndex);
         }
     };
 
     const handleJumpToQuestion = (index: number) => {
         if (index >= 0 && index < questions.length) {
             setCurrentIndex(index);
+            if (user) saveUserProgress(user.id, index);
             setView('quiz'); // Switch back to quiz view
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
