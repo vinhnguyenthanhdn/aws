@@ -27,17 +27,9 @@ export const Header: React.FC<HeaderProps> = ({
                         <AuthButton currentLanguage={currentLanguage} />
                         {user && onHistoryClick && (
                             <button
-                                className={`btn-history ${isHistoryView ? 'active' : ''}`}
+                                className={`btn ${isHistoryView ? 'btn-primary' : 'btn-secondary'}`}
                                 onClick={onHistoryClick}
-                                style={{
-                                    padding: '0.5rem 1rem',
-                                    borderRadius: '6px',
-                                    border: '1px solid var(--border)',
-                                    background: isHistoryView ? 'var(--primary)' : 'var(--surface)',
-                                    color: isHistoryView ? 'white' : 'var(--text-primary)',
-                                    cursor: 'pointer',
-                                    marginLeft: '1rem'
-                                }}
+                                style={{ marginLeft: '1rem' }}
                             >
                                 {isHistoryView ? 'Back to Quiz' : 'My History'}
                             </button>

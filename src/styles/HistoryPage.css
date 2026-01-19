@@ -1,136 +1,137 @@
-.history-page {
-    padding: 2rem 0;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
+/* Reusing .card style from index.css for consistency */
 .history-header {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-border);
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-xl);
 }
 
 .history-stats {
     display: flex;
-    gap: 1rem;
+    gap: var(--space-lg);
     font-size: 0.9rem;
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
+    margin-top: var(--space-xs);
 }
 
-.clear-history-btn {
-    background-color: var(--error);
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: opacity 0.2s;
-}
-
-.clear-history-btn:hover {
-    opacity: 0.9;
-}
-
+/* History Items grouped like QuestionCard */
 .history-group {
-    background: var(--surface);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border);
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-base);
+}
+
+.history-group:hover {
+    box-shadow: var(--shadow-lg);
 }
 
 .group-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .question-title {
     font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-xs);
+    line-height: 1.4;
 }
 
-.jump-btn {
-    background-color: var(--primary);
-    color: white;
-    border: none;
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
-    cursor: pointer;
+.question-meta {
     font-size: 0.85rem;
-    white-space: nowrap;
-    margin-left: 1rem;
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
 }
 
 .submissions-list {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: var(--space-sm);
 }
 
 .submission-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.8rem;
-    border-radius: 8px;
-    background: var(--background);
-    border-left: 4px solid transparent;
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-secondary);
+    border: 1px solid transparent;
+    transition: all var(--transition-fast);
+}
+
+.submission-item:hover {
+    transform: translateX(4px);
 }
 
 .submission-item.correct {
-    border-left-color: var(--success);
-    background: rgba(var(--success-rgb), 0.05);
+    border-left: 4px solid var(--color-success);
+    background: linear-gradient(to right, var(--color-success-light), var(--color-bg-secondary));
 }
 
 .submission-item.incorrect {
-    border-left-color: var(--error);
-    background: rgba(var(--error-rgb), 0.05);
+    border-left: 4px solid var(--color-error);
+    background: linear-gradient(to right, var(--color-error-light), var(--color-bg-secondary));
 }
 
 .submission-info {
     display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
+    align-items: center;
+    gap: var(--space-lg);
 }
 
 .submission-answer {
-    font-weight: 500;
-    font-family: monospace;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
 }
 
 .submission-time {
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
 }
 
 .status-badge {
-    padding: 0.2rem 0.6rem;
-    border-radius: 12px;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
     font-size: 0.8rem;
-    font-weight: 500;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .status-badge.correct {
-    background-color: rgba(var(--success-rgb), 0.1);
-    color: var(--success);
+    background-color: var(--color-success-light);
+    color: var(--color-success);
 }
 
 .status-badge.incorrect {
-    background-color: rgba(var(--error-rgb), 0.1);
-    color: var(--error);
+    background-color: var(--color-error-light);
+    color: var(--color-error);
 }
 
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
-    color: var(--text-secondary);
+    color: var(--color-text-secondary);
+}
+
+/* Animations */
+.history-group {
+    animation: fadeIn var(--transition-base);
 }

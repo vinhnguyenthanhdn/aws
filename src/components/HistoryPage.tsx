@@ -44,9 +44,7 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
         return acc;
     }, {} as Record<string, UserSubmission[]>);
 
-    // Sort groups by latest submission time? Or keep original question order?
-    // Requirement: "Jump to question"
-    // Let's sort groups by most recently submitted question first.
+    // Sort groups by latest submission time
     const sortedGroups = Object.entries(groupedSubmissions).sort(([, aSubs], [, bSubs]) => {
         const aLatest = new Date(aSubs[0].created_at).getTime();
         const bLatest = new Date(bSubs[0].created_at).getTime();
@@ -69,16 +67,17 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
     }
 
     return (
-        <div className="history-page">
+        <div className="history-page fade-in">
             <div className="history-header">
                 <div>
-                    <h1>Submission History</h1>
+                    <h2>Submission History</h2>
                     <div className="history-stats">
-                        <span>Total Submissions: {submissions.length}</span>
-                        <span>Questions Attempted: {Object.keys(groupedSubmissions).length}</span>
+                        <span><strong>{submissions.length}</strong> Total Submissions</span>
+                        <span>•</span>
+                        <span><strong>{Object.keys(groupedSubmissions).length}</strong> Questions Attempted</span>
                     </div>
                 </div>
-                <button onClick={handleClearHistory} className="clear-history-btn">
+                <button onClick={handleClearHistory} className="btn btn-error btn-sm">
                     Clear History
                 </button>
             </div>
@@ -86,45 +85,46 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
             <div className="history-list">
                 {sortedGroups.map(([questionId, groupSubs]) => {
                     const question = questions.find(q => q.id === questionId);
-                    // Find actual index in the questions array to jump to
                     const questionIndex = questions.findIndex(q => q.id === questionId);
 
-                    if (!question) return null; // Should not happen unless questions changed
+                    if (!question) return null;
 
                     return (
                         <div key={questionId} className="history-group">
                             <div className="group-header">
-                                <div>
+                                <div style={{ flex: 1 }}>
                                     <div className="question-title">
-                                        Question {questionIndex + 1}: {question.question.substring(0, 100)}...
+                                        Question {questionIndex + 1}: {question.question.substring(0, 120)}...
                                     </div>
                                     <div className="question-meta">
                                         ID: {questionId}
                                     </div>
                                 </div>
                                 <button
-                                    className="jump-btn"
+                                    className="btn btn-primary btn-sm"
                                     onClick={() => onJumpToQuestion(questionIndex)}
+                                    style={{ marginLeft: '1rem' }}
                                 >
-                                    Go to Question
+                                    Jump to Question
                                 </button>
                             </div>
 
                             <div className="submissions-list">
-                                {groupSubs.map((sub) => (
+                                {groupSubs.map((sub, idx) => (
                                     <div
                                         key={sub.id}
                                         className={`submission-item ${sub.is_correct ? 'correct' : 'incorrect'}`}
                                     >
                                         <div className="submission-info">
-                                            <span className="submission-answer">Answer: {sub.answer}</span>
-                                            <span className="submission-time">
-                                                {new Date(sub.created_at).toLocaleString()}
-                                            </span>
+                                            <span style={{ fontWeight: 'bold', width: '2rem' }}>#{groupSubs.length - idx}</span>
+                                            <div className={`status-badge ${sub.is_correct ? 'correct' : 'incorrect'}`}>
+                                                {sub.is_correct ? 'Correct' : 'Incorrect'}
+                                            </div>
+                                            <span className="submission-answer">You chose: {sub.answer}</span>
                                         </div>
-                                        <div className={`status-badge ${sub.is_correct ? 'correct' : 'incorrect'}`}>
-                                            {sub.is_correct ? 'Correct' : 'Incorrect'}
-                                        </div>
+                                        <span className="submission-time">
+                                            {new Date(sub.created_at).toLocaleString()}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
