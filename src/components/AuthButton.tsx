@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
+import type { Language } from '../types';
+import { getText } from '../lib/translations';
 import '../styles/AuthButton.css';
 
-export const AuthButton: React.FC = () => {
+interface AuthButtonProps {
+    currentLanguage?: Language;
+}
+
+export const AuthButton: React.FC<AuthButtonProps> = ({ currentLanguage = 'vi' }) => {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
@@ -82,10 +88,13 @@ export const AuthButton: React.FC = () => {
                     </button>
                 </div>
             ) : (
-                <button className="auth-btn" onClick={handleLogin}>
-                    <span className="google-icon">G</span>
-                    Sign in with Google
-                </button>
+                <>
+                    <span className="auth-cta">{getText(currentLanguage, 'login_cta')}</span>
+                    <button className="auth-btn" onClick={handleLogin}>
+                        <span className="google-icon">G</span>
+                        Sign in with Google
+                    </button>
+                </>
             )}
         </div>
     );

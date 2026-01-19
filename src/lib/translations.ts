@@ -92,6 +92,10 @@ const translations: Translations = {
         vi: 'Liên hệ',
         en: 'Contact',
     },
+    login_cta: {
+        vi: 'Đăng nhập để cá nhân hóa quá trình học',
+        en: 'Sign in to personalize your learning',
+    },
 };
 
 export function getText(language: Language, key: string): string {

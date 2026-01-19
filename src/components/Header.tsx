@@ -14,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ currentLanguage, onLanguageChang
         <header className="app-header">
             <div className="container">
                 <div className="header-content">
-                    <AuthButton />
+                    <AuthButton currentLanguage={currentLanguage} />
                     <LanguageSelector
                         currentLanguage={currentLanguage}
                         onLanguageChange={onLanguageChange}
