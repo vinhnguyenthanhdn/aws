@@ -23,6 +23,7 @@ function App() {
     const [activeAISection, setActiveAISection] = useState<'theory' | 'explanation' | null>(null);
     const [aiContent, setAiContent] = useState<Record<string, string>>({});
     const [user, setUser] = useState<User | null>(null);
+    const [isRestoringProgress, setIsRestoringProgress] = useState(true);
 
     // Load questions on mount
     useEffect(() => {
@@ -144,10 +145,14 @@ function App() {
                 console.log('Retrieved saved progress:', savedIndex);
 
                 if (savedIndex !== null) {
+                    // Start restoring
                     const params = new URLSearchParams(window.location.search);
                     const qParam = params.get('q');
                     console.log('Current URL q param:', qParam);
 
+                    // Restore ONLY if there is no explicit Q param in the initial URL
+                    // Note: This logic assumes that if we handle this fast enough, the URL Update effect hasn't run yet
+                    // OR we check against our own default injection. 
                     if (!qParam) {
                         console.log('Restoring progress to index:', savedIndex);
                         setCurrentIndex(savedIndex);
@@ -156,21 +161,33 @@ function App() {
                     }
                 }
             }
+            // Done checking auth/progress
+            setIsRestoringProgress(false);
         };
 
+        // We need to know if we are waiting for auth
+        // getSession returns almost immediately with local session
         supabase.auth.getSession().then(({ data: { session } }) => {
             handleAuthChange(session);
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            handleAuthChange(session);
+            // On subsequent changes, we don't necessarily block URL updates, 
+            // but we might want to update user state.
+            // We can just set user here. The initial load is what matters for isRestoringProgress.
+            if (!isRestoringProgress) {
+                setUser(session?.user ?? null);
+            }
         });
 
         return () => subscription.unsubscribe();
-    }, []); // Run once on mount
+    }, []); // Run once on mount due to isRestoringProgress ref check logic inside? No, dependency empty.
 
     // Update URL & Save Progress when index changes
     useEffect(() => {
+        // Don't update URL if we are still determining start index
+        if (isRestoringProgress) return;
+
         // Avoid overwriting URL if Auth flow is active
         const hash = window.location.hash;
         const search = window.location.search;
@@ -190,11 +207,9 @@ function App() {
 
         // Save progress if logged in
         if (user) {
-            // Debouncing could be good here, but for now direct save is simple.
-            // Since this effect runs on every question change, it's consistent.
             saveUserProgress(user.id, currentIndex);
         }
-    }, [currentIndex, user]);
+    }, [currentIndex, user, isRestoringProgress]);
 
     // Save answers to localStorage
     useEffect(() => {
