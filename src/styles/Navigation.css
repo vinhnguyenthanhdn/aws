@@ -15,13 +15,22 @@
 .jump-form {
     display: flex;
     gap: var(--space-sm);
-    align-items: center;
+    align-items: stretch;
+    /* Make button same height as input */
 }
 
 .jump-input {
-    width: 200px;
+    width: 120px;
+    /* Reduced from 200px for compact layout */
     font-size: 16px;
     /* Prevent iOS auto-zoom (requires >= 16px) */
+}
+
+/* Go button styling */
+.jump-form .btn {
+    min-width: 80px;
+    /* Make Go button wider and easier to tap */
+    padding: var(--space-sm) var(--space-lg);
 }
 
 @media (max-width: 768px) {
@@ -39,6 +48,17 @@
     }
 
     .jump-input {
+        width: auto;
         flex: 1;
+        max-width: 120px;
+        /* Keep input compact on mobile */
+    }
+
+    /* Make Go button more prominent on mobile */
+    .jump-form .btn {
+        flex: 1;
+        min-width: 100px;
+        font-size: 1rem;
+        font-weight: 600;
     }
 }
