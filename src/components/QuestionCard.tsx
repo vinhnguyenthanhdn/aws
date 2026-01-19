@@ -12,7 +12,7 @@ interface QuestionCardProps {
     onSubmit: (answer: string) => void;
     onRequestTheory: () => void;
     onRequestExplanation: () => void;
-    isLoadingAI: boolean;
+    loadingAction: 'theory' | 'explanation' | null;
 }
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -24,10 +24,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     onSubmit,
     onRequestTheory,
     onRequestExplanation,
-    isLoadingAI,
+    loadingAction,
 }) => {
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const t = (key: string) => getText(language, key);
+    const isLoadingAI = !!loadingAction;
 
     const handleOptionChange = (optionLetter: string) => {
         if (question.is_multiselect) {
@@ -114,7 +115,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                         onClick={onRequestTheory}
                         disabled={isLoadingAI}
                     >
-                        {isLoadingAI ? t('loading_theory') : t('btn_theory')}
+                        {loadingAction === 'theory' ? t('loading_theory') : t('btn_theory')}
                     </button>
                     <button
                         type="button"
@@ -122,7 +123,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                         onClick={onRequestExplanation}
                         disabled={isLoadingAI}
                     >
-                        {isLoadingAI ? t('loading_explanation') : t('btn_explain')}
+                        {loadingAction === 'explanation' ? t('loading_explanation') : t('btn_explain')}
                     </button>
                     <button
                         type="submit"

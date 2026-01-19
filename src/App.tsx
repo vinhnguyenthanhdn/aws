@@ -304,7 +304,7 @@ function App() {
                     onSubmit={handleSubmitAnswer}
                     onRequestTheory={handleRequestTheory}
                     onRequestExplanation={handleRequestExplanation}
-                    isLoadingAI={aiLoading}
+                    loadingAction={aiLoading ? activeAISection : null}
                 />
 
                 {aiLoading && <Loading message="AI is thinking..." />}
