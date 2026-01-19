@@ -353,4 +353,11 @@ pre {
     .card {
         padding: var(--space-md);
     }
+
+    /* Ensure inputs don't zoom on iOS (must be >= 16px) */
+    .input,
+    .select,
+    .textarea {
+        font-size: 16px;
+    }
 }

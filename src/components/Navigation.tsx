@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { Language } from '../types';
 import { getText } from '../lib/translations';
 import '../styles/Navigation.css';
@@ -21,6 +21,7 @@ export const Navigation: React.FC<NavigationProps> = ({
     onJumpToQuestion,
 }) => {
     const [jumpValue, setJumpValue] = useState('');
+    const inputRef = useRef<HTMLInputElement>(null);
     const t = (key: string) => getText(language, key);
 
     const handleJump = (e: React.FormEvent) => {
@@ -29,6 +30,8 @@ export const Navigation: React.FC<NavigationProps> = ({
         if (questionNumber >= 1 && questionNumber <= totalQuestions) {
             onJumpToQuestion(questionNumber - 1);
             setJumpValue('');
+            // Blur input to dismiss keyboard and zoom out on mobile
+            inputRef.current?.blur();
         }
     };
 
@@ -48,6 +51,7 @@ export const Navigation: React.FC<NavigationProps> = ({
 
                 <form onSubmit={handleJump} className="jump-form">
                     <input
+                        ref={inputRef}
                         type="number"
                         min="1"
                         max={totalQuestions}
