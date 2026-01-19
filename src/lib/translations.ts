@@ -81,8 +81,8 @@ const translations: Translations = {
         en: '📚 AI Theory',
     },
     jump_to_question: {
-        vi: 'Nhảy đến câu hỏi',
-        en: 'Jump to question',
+        vi: 'Câu số',
+        en: 'Go to #',
     },
     progress: {
         vi: 'Tiến độ',
