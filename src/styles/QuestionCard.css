@@ -83,6 +83,14 @@
     background: var(--color-primary-light);
 }
 
+/* Dark mode for selected option - darker background for readability */
+@media (prefers-color-scheme: dark) {
+    .option-label.selected {
+        background: hsl(210, 50%, 28%);
+        border-color: hsl(210, 100%, 60%);
+    }
+}
+
 .option-text {
     flex: 1;
     font-size: 1rem;

@@ -66,6 +66,11 @@
         --color-text-primary: hsl(220, 20%, 98%);
         --color-text-secondary: hsl(220, 10%, 70%);
         --color-border: hsl(220, 15%, 25%);
+
+        /* Override light colors for dark mode - darker backgrounds with good contrast */
+        --color-primary-light: hsl(210, 60%, 25%);
+        --color-success-light: hsl(142, 50%, 20%);
+        --color-error-light: hsl(0, 50%, 25%);
     }
 }
 

@@ -10,6 +10,17 @@
     border-left-color: var(--color-warning);
 }
 
+/* Dark mode overrides for AI content */
+@media (prefers-color-scheme: dark) {
+    .ai-content {
+        background: linear-gradient(135deg, hsl(210, 50%, 22%) 0%, var(--color-bg-card) 100%);
+    }
+
+    .ai-content.theory {
+        background: linear-gradient(135deg, hsl(45, 50%, 22%) 0%, var(--color-bg-card) 100%);
+    }
+}
+
 .ai-content-header {
     margin-bottom: var(--space-lg);
 }
@@ -124,6 +135,23 @@
 .markdown-body pre code {
     background: none;
     padding: 0;
+}
+
+/* Dark mode for markdown */
+@media (prefers-color-scheme: dark) {
+    .markdown-body code {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--color-text-primary);
+    }
+
+    .markdown-body pre {
+        background: hsl(220, 20%, 14%);
+        color: var(--color-text-primary);
+    }
+
+    .loading-overlay {
+        background: rgba(30, 35, 45, 0.95);
+    }
 }
 
 .loading-overlay {
