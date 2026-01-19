@@ -1,17 +1,6 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { supabase } from './supabase';
 import type { Language } from '../types';
-
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
-
-interface AIResponse {
-    candidates: Array<{
-        content: {
-            parts: Array<{
-                text: string;
-            }>;
-        };
-    }>;
-}
 
 const getApiKey = () => {
     // Try to get list of keys first
@@ -34,29 +23,11 @@ async function callGeminiAPI(prompt: string): Promise<string> {
     }
 
     try {
-        const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }]
-            })
-        });
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-        if (!response.ok) {
-            // Check for quota exceeded specifically if we want to be fancy, but simple error throw is fine for now
-            // If we had retry logic with different keys, it would go here. 
-            // For now, let's just throw.
-            throw new Error(`API call failed: ${response.statusText}`);
-        }
-
-        const data: AIResponse = await response.json();
-        return data.candidates[0]?.content?.parts[0]?.text || 'No response generated';
+        const result = await model.generateContent(prompt);
+        return result.response.text() || 'No response generated';
     } catch (error) {
         console.error('Error calling Gemini API:', error);
         throw error;
