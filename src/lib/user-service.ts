@@ -2,6 +2,7 @@ import { supabase } from './supabase';
 
 export async function saveUserProgress(userId: string, index: number) {
     try {
+        console.log('Saving progress for user:', userId, 'Index:', index);
         const { error } = await supabase
             .from('user_progress')
             .upsert({
@@ -11,6 +12,7 @@ export async function saveUserProgress(userId: string, index: number) {
             }, { onConflict: 'user_id' });
 
         if (error) throw error;
+        console.log('Progress saved successfully');
     } catch (error) {
         console.error('Error saving user progress:', error);
     }
