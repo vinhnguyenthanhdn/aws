@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Question, Language } from '../types';
 import { getText } from '../lib/translations';
 import '../styles/QuestionCard.css';
@@ -27,6 +27,16 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     loadingAction,
 }) => {
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+
+    // Reset or restore selection when question changes
+    useEffect(() => {
+        if (userAnswer) {
+            setSelectedOptions(userAnswer.split(''));
+        } else {
+            setSelectedOptions([]);
+        }
+    }, [question.id, userAnswer]);
+
     const t = (key: string) => getText(language, key);
     const isLoadingAI = !!loadingAction;
 
