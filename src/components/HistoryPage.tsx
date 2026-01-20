@@ -109,7 +109,7 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
                             <div className="group-header">
                                 <div className="question-info">
                                     <div className="question-identifier">
-                                        Question {questionIndex + 1}: {question.id}
+                                        Question {questionIndex + 1}:
                                     </div>
                                     <div className="question-text-preview">
                                         {question.question}
