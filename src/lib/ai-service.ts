@@ -115,6 +115,26 @@ export async function getAIExplanation(
         ? 'Vui lòng trả lời bằng tiếng Việt.'
         : 'Please respond in English.';
 
+    const promptStructure = language === 'vi'
+        ? `1. **Giải thích câu hỏi**: Phân tích yêu cầu chính của câu hỏi, xác định các điểm mấu chốt cần chú ý.
+
+2. **Giải thích đáp án đúng**: Tại sao đáp án ${correctAnswer} là đúng? Giải thích chi tiết cách nó đáp ứng yêu cầu của câu hỏi.
+
+3. **Tại sao không chọn các đáp án khác**: Phân tích từng đáp án sai, giải thích lý do tại sao chúng không phù hợp hoặc không tối ưu.
+
+4. **Các lỗi thường gặp (Common Mistakes)**: Liệt kê các lỗi mà thí sinh hay mắc phải khi gặp dạng câu hỏi này.
+
+5. **Mẹo để nhớ (Tips to Remember)**: Cung cấp các mẹo, tricks hoặc cách nhớ nhanh để áp dụng cho các câu hỏi tương tự.`
+        : `1. **Question Analysis**: Analyze the main requirements of the question and identify the key points to focus on.
+
+2. **Correct Answer Explanation**: Why is answer ${correctAnswer} correct? Explain in detail how it meets the question's requirements.
+
+3. **Why Other Answers Are Wrong**: Analyze each incorrect answer and explain why they are not suitable or not optimal.
+
+4. **Common Mistakes**: List the mistakes that students often make when encountering this type of question.
+
+5. **Tips to Remember**: Provide tips, tricks, or memorization techniques to apply to similar questions.`;
+
     const prompt = `You are an AWS Solutions Architect expert. Analyze this SAA-C03 exam question.
 
 Question: ${question}
@@ -126,19 +146,11 @@ Correct Answer: ${correctAnswer}
 
 ${languageInstruction}
 
-IMPORTANT: Start directly with the analysis. Do NOT include any greetings, introductions (like "Chào bạn, là một chuyên gia..."), or conclusions. Go straight to the structured content below.
+IMPORTANT: Start directly with the analysis. Do NOT include any greetings, introductions (like "Chào bạn, là một chuyên gia..." or "Hello, as an expert..."), or conclusions. Go straight to the structured content below.
 
 Provide a comprehensive explanation covering:
 
-1. **Giải thích câu hỏi**: Phân tích yêu cầu chính của câu hỏi, xác định các điểm mấu chốt cần chú ý.
-
-2. **Giải thích đáp án đúng**: Tại sao đáp án ${correctAnswer} là đúng? Giải thích chi tiết cách nó đáp ứng yêu cầu của câu hỏi.
-
-3. **Tại sao không chọn các đáp án khác**: Phân tích từng đáp án sai, giải thích lý do tại sao chúng không phù hợp hoặc không tối ưu.
-
-4. **Các lỗi thường gặp (Common Mistakes)**: Liệt kê các lỗi mà thí sinh hay mắc phải khi gặp dạng câu hỏi này.
-
-5. **Mẹo để nhớ (Tips to Remember)**: Cung cấp các mẹo, tricks hoặc cách nhớ nhanh để áp dụng cho các câu hỏi tương tự.
+${promptStructure}
 
 Keep the explanation structured and easy to understand (max 500 words).`;
 
@@ -172,6 +184,14 @@ export async function getAITheory(
         ? 'Vui lòng trả lời bằng tiếng Việt.'
         : 'Please respond in English.';
 
+    const promptStructure = language === 'vi'
+        ? `1. **Cơ sở lý thuyết các thuật ngữ trong câu hỏi**: Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật được đề cập trong câu hỏi. Mỗi thuật ngữ cần được giải thích ngắn gọn nhưng đầy đủ.
+
+2. **Cơ sở lý thuyết các thuật ngữ trong đáp án**: Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật xuất hiện trong các đáp án (A, B, C, D). Đặc biệt chú ý những thuật ngữ khác với phần câu hỏi.`
+        : `1. **Theoretical Foundation of Question Terms**: List and explain ALL AWS services, concepts, and technical terms mentioned in the question. Each term should be explained concisely but thoroughly.
+
+2. **Theoretical Foundation of Answer Terms**: List and explain ALL AWS services, concepts, and technical terms appearing in the answers (A, B, C, D). Pay special attention to terms that differ from those in the question.`;
+
     const prompt = `You are an AWS Solutions Architect expert. Provide theoretical foundation for this question.
 
 Question: ${question}
@@ -185,9 +205,7 @@ IMPORTANT: Start directly with the theoretical content. Do NOT include any greet
 
 Provide a comprehensive theoretical breakdown:
 
-1. **Cơ sở lý thuyết các thuật ngữ trong câu hỏi**: Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật được đề cập trong câu hỏi. Mỗi thuật ngữ cần được giải thích ngắn gọn nhưng đầy đủ.
-
-2. **Cơ sở lý thuyết các thuật ngữ trong đáp án**: Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật xuất hiện trong các đáp án (A, B, C, D). Đặc biệt chú ý những thuật ngữ khác với phần câu hỏi.
+${promptStructure}
 
 Keep the theory organized and easy to reference (max 500 words).`;
 
