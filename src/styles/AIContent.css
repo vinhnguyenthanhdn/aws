@@ -84,10 +84,8 @@
     margin-bottom: 0.75em;
     color: var(--color-text-primary);
     font-weight: 700;
-}
-
-.markdown-body h3 {
-    font-size: 1.1em;
+    font-size: 1.15rem;
+    /* Unified font size for all headings */
 }
 
 .markdown-body p {
