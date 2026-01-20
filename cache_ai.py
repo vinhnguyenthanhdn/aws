@@ -352,8 +352,8 @@ def process_question(
         else:
             results[content_type] = 'api_failed'
         
-        # Rate limiting - wait between API calls
-        time.sleep(0.5)
+        # Rate limiting - wait between API calls (increased to avoid rate limits)
+        time.sleep(2)  # Increased from 0.5s to 2s
     
     return results
 
