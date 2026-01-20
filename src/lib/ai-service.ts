@@ -23,8 +23,6 @@ async function callGeminiAPI(prompt: string): Promise<string> {
         throw new Error('No API Key configured');
     }
 
-    let lastError: any = null;
-
     // Try each API key until one succeeds
     for (let i = 0; i < apiKeys.length; i++) {
         const apiKey = apiKeys[i];
@@ -45,7 +43,6 @@ async function callGeminiAPI(prompt: string): Promise<string> {
 
             console.warn(`⚠️ ${keyId} returned empty response`);
         } catch (error: any) {
-            lastError = error;
             const errorMsg = error?.message || String(error);
 
             // Check if it's a rate limit or quota error
