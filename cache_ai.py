@@ -83,23 +83,33 @@ def get_explanation_prompt(question: str, options: str, correct_answer: str, lan
     """Tạo prompt cho Giải thích (Explanation)"""
     language_instruction = 'Vui lòng trả lời bằng tiếng Việt.' if language == 'vi' else 'Please respond in English.'
     
-    prompt_structure = f"""1. **Giải thích câu hỏi**: Phân tích yêu cầu chính của câu hỏi, xác định các điểm mấu chốt cần chú ý.
+    prompt_structure = f"""## Giải thích câu hỏi
+Phân tích yêu cầu chính của câu hỏi, xác định các điểm mấu chốt cần chú ý.
 
-2. **Giải thích đáp án đúng**: Tại sao đáp án {correct_answer} là đúng? Giải thích chi tiết cách nó đáp ứng yêu cầu của câu hỏi.
+## Giải thích đáp án đúng
+Tại sao đáp án {correct_answer} là đúng? Giải thích chi tiết cách nó đáp ứng yêu cầu của câu hỏi.
 
-3. **Tại sao không chọn các đáp án khác**: Phân tích từng đáp án sai, giải thích lý do tại sao chúng không phù hợp hoặc không tối ưu.
+## Tại sao không chọn các đáp án khác
+Phân tích từng đáp án sai, giải thích lý do tại sao chúng không phù hợp hoặc không tối ưu.
 
-4. **Các lỗi thường gặp (Common Mistakes)**: Liệt kê các lỗi mà thí sinh hay mắc phải khi gặp dạng câu hỏi này.
+## Các lỗi thường gặp (Common Mistakes)
+Liệt kê các lỗi mà thí sinh hay mắc phải khi gặp dạng câu hỏi này.
 
-5. **Mẹo để nhớ (Tips to Remember)**: Cung cấp các mẹo, tricks hoặc cách nhớ nhanh để áp dụng cho các câu hỏi tương tự.""" if language == 'vi' else f"""1. **Question Analysis**: Analyze the main requirements of the question and identify the key points to focus on.
+## Mẹo để nhớ (Tips to Remember)
+Cung cấp các mẹo, tricks hoặc cách nhớ nhanh để áp dụng cho các câu hỏi tương tự.""" if language == 'vi' else f"""## Question Analysis
+Analyze the main requirements of the question and identify the key points to focus on.
 
-2. **Correct Answer Explanation**: Why is answer {correct_answer} correct? Explain in detail how it meets the question's requirements.
+## Correct Answer Explanation
+Why is answer {correct_answer} correct? Explain in detail how it meets the question's requirements.
 
-3. **Why Other Answers Are Wrong**: Analyze each incorrect answer and explain why they are not suitable or not optimal.
+## Why Other Answers Are Wrong
+Analyze each incorrect answer and explain why they are not suitable or not optimal.
 
-4. **Common Mistakes**: List the mistakes that students often make when encountering this type of question.
+## Common Mistakes
+List the mistakes that students often make when encountering this type of question.
 
-5. **Tips to Remember**: Provide tips, tricks, or memorization techniques to apply to similar questions."""
+## Tips to Remember
+Provide tips, tricks, or memorization techniques to apply to similar questions."""
     
     return f"""You are an AWS Solutions Architect expert. Analyze this SAA-C03 exam question.
 
@@ -125,11 +135,15 @@ def get_theory_prompt(question: str, options: str, language: str) -> str:
     """Tạo prompt cho Lý Thuyết (Theory)"""
     language_instruction = 'Vui lòng trả lời bằng tiếng Việt.' if language == 'vi' else 'Please respond in English.'
     
-    prompt_structure = """1. **Cơ sở lý thuyết các thuật ngữ trong câu hỏi**: Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật được đề cập trong câu hỏi. Mỗi thuật ngữ cần được giải thích ngắn gọn nhưng đầy đủ.
+    prompt_structure = """## Cơ sở lý thuyết các thuật ngữ trong câu hỏi
+Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật được đề cập trong câu hỏi. Mỗi thuật ngữ cần được giải thích ngắn gọn nhưng đầy đủ.
 
-2. **Cơ sở lý thuyết các thuật ngữ trong đáp án**: Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật xuất hiện trong các đáp án (A, B, C, D). Đặc biệt chú ý những thuật ngữ khác với phần câu hỏi.""" if language == 'vi' else """1. **Theoretical Foundation of Question Terms**: List and explain ALL AWS services, concepts, and technical terms mentioned in the question. Each term should be explained concisely but thoroughly.
+## Cơ sở lý thuyết các thuật ngữ trong đáp án
+Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật xuất hiện trong các đáp án (A, B, C, D). Đặc biệt chú ý những thuật ngữ khác với phần câu hỏi.""" if language == 'vi' else """## Theoretical Foundation of Question Terms
+List and explain ALL AWS services, concepts, and technical terms mentioned in the question. Each term should be explained concisely but thoroughly.
 
-2. **Theoretical Foundation of Answer Terms**: List and explain ALL AWS services, concepts, and technical terms appearing in the answers (A, B, C, D). Pay special attention to terms that differ from those in the question."""
+## Theoretical Foundation of Answer Terms
+List and explain ALL AWS services, concepts, and technical terms appearing in the answers (A, B, C, D). Pay special attention to terms that differ from those in the question."""
     
     return f"""You are an AWS Solutions Architect expert. Provide theoretical foundation for this question.
 
