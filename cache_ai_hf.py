@@ -37,11 +37,13 @@ SUPABASE_KEY = os.getenv('VITE_SUPABASE_ANON_KEY') or os.getenv('SUPABASE_KEY')
 
 # Hugging Face Configuration
 HUGGINGFACE_API_KEY = os.getenv('HUGGINGFACE_API_KEY')
-# Good free models: 
-# - meta-llama/Meta-Llama-3-8B-Instruct (Recommended for Chat API)
+# Recommended models for Inference API (Free Tier friendly but powerful):
+# - google/gemma-2-27b-it (Strong reasoning, balanced size)
+# - Qwen/Qwen2.5-Coder-32B-Instruct (Excellent for technical content)
+# - meta-llama/Meta-Llama-3-8B-Instruct (Fast, reliable chat)
 # - mistralai/Mistral-7B-Instruct-v0.3
-# - microsoft/Phi-3-mini-4k-instruct
-HF_MODEL = os.getenv('HF_MODEL') or "meta-llama/Meta-Llama-3-8B-Instruct"
+# - microsoft/Phi-3-medium-4k-instruct
+HF_MODEL = os.getenv('HF_MODEL') or "google/gemma-2-27b-it"
 
 # Validate configuration
 if not SUPABASE_URL or not SUPABASE_KEY:
