@@ -23,15 +23,14 @@ export const AIContent: React.FC<AIContentProps> = ({
     const t = (key: string) => getText(language, key);
     const title = type === 'theory' ? t('ai_theory') : t('ai_explanation');
 
-    // Clean AI output - remove leading colons and extra spacing
+    // Clean AI output - ONLY remove colons, don't add line breaks
     const cleanContent = (text: string): string => {
         return text
-            // Remove ": " after bold keywords
-            .replace(/(\*\*[^*]+\*\*)\s*:\s*/g, '$1\n\n')
-            // Remove standalone ": " at start of lines  
+            // Remove ONLY the colon and space after bold keywords
+            // Keep text on same line to preserve context
+            .replace(/(\*\*[^*]+\*\*)\s*:\s*/g, '$1 ')
+            // Remove standalone ": " at start of lines
             .replace(/^\s*:\s+/gm, '')
-            // Clean up multiple newlines
-            .replace(/\n{3,}/g, '\n\n')
             .trim();
     };
 
