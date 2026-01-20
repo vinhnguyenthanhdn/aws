@@ -16,6 +16,38 @@ const getAllApiKeys = (): string[] => {
     return keys;
 };
 
+// Helper to get last used key index
+async function getLastUsedKeyIndex(): Promise<number> {
+    try {
+        const { data, error } = await supabase
+            .from('app_settings')
+            .select('value')
+            .eq('key', 'gemini_key_index')
+            .single();
+
+        if (error || !data) return 0;
+        return parseInt(data.value, 10) || 0;
+    } catch (e) {
+        console.warn('Failed to get last key index:', e);
+        return 0;
+    }
+}
+
+// Helper to save last used key index
+async function updateLastUsedKeyIndex(index: number) {
+    try {
+        await supabase
+            .from('app_settings')
+            .upsert({
+                key: 'gemini_key_index',
+                value: String(index),
+                updated_at: new Date().toISOString()
+            });
+    } catch (e) {
+        console.warn('Failed to update last key index:', e);
+    }
+}
+
 async function callGeminiAPI(prompt: string): Promise<string> {
     const apiKeys = getAllApiKeys();
 
@@ -23,8 +55,16 @@ async function callGeminiAPI(prompt: string): Promise<string> {
         throw new Error('No API Key configured');
     }
 
-    // Try each API key until one succeeds
-    for (let i = 0; i < apiKeys.length; i++) {
+    // Get start index from DB
+    const startIndex = await getLastUsedKeyIndex();
+    console.log(`🔄 Starting with API key index: ${startIndex}`);
+
+    // Try each API key looking for success, starting from startIndex
+    // Loop logic: we want to try exactly apiKeys.length times
+    for (let offset = 0; offset < apiKeys.length; offset++) {
+        // Calculate actual index with wrap-around
+        const i = (startIndex + offset) % apiKeys.length;
+
         const apiKey = apiKeys[i];
         const keyId = `key ${i + 1}/${apiKeys.length}`;
 
@@ -38,6 +78,22 @@ async function callGeminiAPI(prompt: string): Promise<string> {
 
             if (text && text.trim() !== '') {
                 console.log(`✅ ${keyId} succeeded`);
+
+                // If we successfully used a DIFFERENT key than we started with,
+                // or just to be safe, update the pointer to the NEXT key (load balancing)
+                // OR update to CURRENT key (stickiness). 
+                // User requested: "save latest key index... to use next key next time"
+                // Let's save the current successful index so we start here (or explicitly next) next time.
+                // Usually "stickiness" is better (stay on working key until it fails).
+                // But if user wants rotation, we can save (i + 1) % length.
+                // Re-reading request: "save latest key index... so next call uses next key" -> implies rotation?
+                // Actually: "if key 1 fails, check key 2... save latest index."
+                // Standard practice: Save the WORKING key index. Start from there next time.
+
+                if (i !== startIndex) {
+                    await updateLastUsedKeyIndex(i);
+                }
+
                 return text;
             }
 
@@ -50,7 +106,8 @@ async function callGeminiAPI(prompt: string): Promise<string> {
                 errorMsg.toLowerCase().includes('rate') ||
                 errorMsg.toLowerCase().includes('429')) {
                 console.warn(`⚠️ ${keyId} rate limited, trying next key...`);
-                continue; // Try next key
+                // Don't save failing index. Loop continues to next key.
+                continue;
             }
 
             // For other errors, also try next key
