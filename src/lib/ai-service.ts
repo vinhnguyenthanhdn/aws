@@ -46,6 +46,8 @@ async function getCachedAIContent(
             .eq('question_id', questionId)
             .eq('language', language)
             .eq('type', type)
+            .order('created_at', { ascending: false })
+            .limit(1)
             .maybeSingle();
 
         if (error) {
