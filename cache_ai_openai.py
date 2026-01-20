@@ -1,16 +1,15 @@
 """
-Hugging Face Cache Builder Script
----------------------------------
-Tạo cache AI cho các câu hỏi AWS SAA-C03 sử dụng Hugging Face Inference API.
-Model mặc định: mistralai/Mistral-7B-Instruct-v0.3
+OpenAI Cache Builder Script
+---------------------------
+Tạo cache AI cho các câu hỏi AWS SAA-C03 sử dụng OpenAI API (GPT-4o-mini).
 
 Cách sử dụng:
-    python cache_ai_hf.py 1-10           # Cache câu hỏi từ 1 đến 10
-    python cache_ai_hf.py 1-10 --lang en # Cache cho tiếng Anh
-    python cache_ai_hf.py 1-10 --force   # Ghi đè cache cũ
+    python cache_ai_openai.py 1-10           # Cache câu hỏi từ 1 đến 10
+    python cache_ai_openai.py 1-10 --lang en # Cache cho tiếng Anh
+    python cache_ai_openai.py 1-10 --force   # Ghi đè cache cũ
 
 Yêu cầu:
-    pip install httpx huggingface_hub python-dotenv
+    pip install httpx openai python-dotenv
 """
 
 import os
@@ -20,12 +19,11 @@ import time
 from typing import Optional
 from dotenv import load_dotenv
 import httpx
-
 try:
-    from huggingface_hub import InferenceClient
+    from openai import OpenAI
 except ImportError:
-    print("❌ Error: Module 'huggingface_hub' chưa được cài đặt.")
-    print("   Vui lòng chạy: pip install huggingface_hub")
+    print("❌ Error: Module 'openai' chưa được cài đặt.")
+    print("   Vui lòng chạy: pip install openai")
     sys.exit(1)
 
 # Load environment variables
@@ -35,25 +33,21 @@ load_dotenv()
 SUPABASE_URL = os.getenv('VITE_SUPABASE_URL') or os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('VITE_SUPABASE_ANON_KEY') or os.getenv('SUPABASE_KEY')
 
-# Hugging Face Configuration
-HUGGINGFACE_API_KEY = os.getenv('HUGGINGFACE_API_KEY')
-# Recommended models for Inference API (Free Tier friendly but powerful):
-# - Qwen/Qwen2.5-Coder-32B-Instruct (Excellent for technical content, might be slower)
-# - google/gemma-2-27b-it (Strong reasoning)
-# - meta-llama/Meta-Llama-3-8B-Instruct (Fast, reliable)
-HF_MODEL = os.getenv('HF_MODEL') or "Qwen/Qwen2.5-72B-Instruct"
+# OpenAI Configuration
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OPENAI_MODEL = os.getenv('OPENAI_MODEL') or "gpt-4o-mini"
 
 # Validate configuration
 if not SUPABASE_URL or not SUPABASE_KEY:
     print("❌ Error: SUPABASE_URL và SUPABASE_KEY chưa được cấu hình!")
     sys.exit(1)
 
-if not HUGGINGFACE_API_KEY:
-    print("❌ Error: HUGGINGFACE_API_KEY chưa được cấu hình trong file .env!")
+if not OPENAI_API_KEY:
+    print("❌ Error: OPENAI_API_KEY chưa được cấu hình trong file .env!")
     sys.exit(1)
 
-print(f"🔑 Using Hugging Face API Key: {HUGGINGFACE_API_KEY[:4]}...{HUGGINGFACE_API_KEY[-4:]}")
-print(f"🤖 Model: {HF_MODEL}")
+print(f"🔑 Using OpenAI API Key: {OPENAI_API_KEY[:8]}...{OPENAI_API_KEY[-4:]}")
+print(f"🤖 Model: {OPENAI_MODEL}")
 
 # Supabase REST API headers
 HEADERS = {
@@ -65,7 +59,7 @@ HEADERS = {
 
 
 def get_theory_prompt(question: str, options: str, language: str) -> str:
-    """Tạo prompt cho Lý Thuyết (Theory)"""
+    """Tạo prompt cho Lý Thuyết (Theory) - giống logic file cũ"""
     language_instruction = 'Vui lòng trả lời bằng tiếng Việt.' if language == 'vi' else 'Please respond in English.'
     
     prompt_structure = """## Cơ sở lý thuyết các thuật ngữ trong câu hỏi
@@ -121,7 +115,7 @@ Keep the theory organized and easy to reference (max 500 words)."""
 
 
 def get_explanation_prompt(question: str, options: str, correct_answer: str, language: str) -> str:
-    """Tạo prompt cho Giải thích (Explanation)"""
+    """Tạo prompt cho Giải thích (Explanation) - giống logic file cũ"""
     language_instruction = 'Vui lòng trả lời bằng tiếng Việt.' if language == 'vi' else 'Please respond in English.'
     
     prompt_structure = f"""## Giải thích câu hỏi
@@ -187,62 +181,30 @@ Provide a comprehensive explanation:
 
 Keep the explanation structured and easy to understand (max 500 words)."""
 
-def call_huggingface(prompt: str, max_retries: int = 5) -> Optional[str]:
-    """Gọi Hugging Face API với retry logic cao hơn cho Serverless endpoints"""
-    client = InferenceClient(api_key=HUGGINGFACE_API_KEY)
+
+def call_openai(prompt: str, max_retries: int = 3) -> Optional[str]:
+    """Gọi OpenAI API với retry logic"""
+    client = OpenAI(api_key=OPENAI_API_KEY)
 
     for attempt in range(max_retries):
         try:
-            # Try chat completion first (best for Instruction/Chat models)
-            try:
-                messages = [
-                    {"role": "system", "content": "You are a helpful AWS expert assistant."},
+            response = client.chat.completions.create(
+                model=OPENAI_MODEL,
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": prompt}
-                ]
-                
-                response = client.chat_completion(
-                    model=HF_MODEL,
-                    messages=messages,
-                    max_tokens=1500,
-                    temperature=0.7
-                )
-                return response.choices[0].message.content
-            
-            except Exception as e:
-                error_msg = str(e).lower()
-                # If model doesn't support chat, fallback to text generation
-                # "mn-404" often indicates model not found or endpoint issue which might be temporary or real
-                if "not a chat model" in error_msg or "invalid_request_error" in error_msg or "mn-404" in error_msg:
-                    print(f"   ℹ️ Fallback to text generation (Chat API error: {e})...")
-                    
-                    # Manual basic formatting - Attempting generic Instruct format
-                    formatted_prompt = f"{prompt}" 
-                    
-                    response = client.text_generation(
-                        formatted_prompt,
-                        model=HF_MODEL,
-                        max_new_tokens=1500,
-                        temperature=0.7
-                    )
-                    return response
-                raise e # Re-raise if it's not a known fallback-able error
-
+                ],
+                temperature=0.7,
+                max_tokens=1500
+            )
+            return response.choices[0].message.content
         except Exception as e:
-            error_str = str(e).lower()
-            
-            # Handling model loading (503) or rate limits (429)
-            if '503' in error_str or 'loading' in error_str:
-                print(f"   ⏳ Model is loading... waiting longer (Attempt {attempt + 1})")
-                time.sleep(10) # Wait longer for model load
-                continue
-                
-            print(f"   ⚠️ Attempt {attempt + 1} failed: {repr(e)}") # Use repr for more detail
-            
+            print(f"   ⚠️ Attempt {attempt + 1} failed: {e}")
             if attempt < max_retries - 1:
-                wait_time = (attempt + 1) * 3
+                wait_time = (attempt + 1) * 2
                 time.sleep(wait_time)
     
-    print("   ❌ Hugging Face API call failed after retries")
+    print("   ❌ OpenAI API call failed after retries")
     return None
 
 
@@ -259,6 +221,7 @@ def get_cached_content(question_id: str, language: str, content_type: str) -> Op
         
         with httpx.Client() as client:
             response = client.get(url, headers=HEADERS, params=params)
+            
             if response.status_code == 200:
                 data = response.json()
                 if data and len(data) > 0:
@@ -349,14 +312,14 @@ def process_question(question: dict, language: str, content_types: list, force: 
                 results[content_type] = 'cached'
                 continue
         
-        print(f"   🤖 Đang tạo {content_type} với Hugging Face ({HF_MODEL})...")
+        print(f"   🤖 Đang tạo {content_type} với OpenAI...")
         
         if content_type == 'theory':
             prompt = get_theory_prompt(question_text, options_str, language)
         else:
             prompt = get_explanation_prompt(question_text, options_str, correct_answer, language)
         
-        content = call_huggingface(prompt)
+        content = call_openai(prompt)
         
         if content:
             if save_to_cache(question_id, language, content_type, content):
@@ -367,14 +330,13 @@ def process_question(question: dict, language: str, content_types: list, force: 
         else:
             results[content_type] = 'api_failed'
         
-        # Hugging Face rate limits can be strict on free tier
-        time.sleep(3) 
+        time.sleep(1) # Gentle formatting delay
     
     return results
 
 
 def main():
-    parser = argparse.ArgumentParser(description='AWS AI Cache Builder (Hugging Face)')
+    parser = argparse.ArgumentParser(description='AWS AI Cache Builder (OpenAI)')
     parser.add_argument('range', help='Range câu hỏi (VD: 1-10)')
     parser.add_argument('--lang', default='vi', choices=['vi', 'en'], help='Ngôn ngữ (vi/en)')
     parser.add_argument('--type', choices=['theory', 'explanation'], help='Loại nội dung (optional)')
@@ -389,11 +351,11 @@ def main():
         sys.exit(1)
     
     print(f"\n╔══════════════════════════════════════════════════════════════╗")
-    print(f"║           AWS SAA-C03 AI Cache Builder (Hugging Face)        ║")
+    print(f"║           AWS SAA-C03 AI Cache Builder (OpenAI)              ║")
     print(f"╠══════════════════════════════════════════════════════════════╣")
     print(f"║  Range: {start} - {end}                                              ")
     print(f"║  Language: {'Tiếng Việt' if args.lang == 'vi' else 'English'}                                      ")
-    print(f"║  Model: {HF_MODEL}")
+    print(f"║  API: OpenAI ({OPENAI_MODEL})                                  ")
     print(f"╚══════════════════════════════════════════════════════════════╝\n")
     
     print(f"📚 Đang lấy câu hỏi từ {start} đến {end}...")
