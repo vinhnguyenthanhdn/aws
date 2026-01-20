@@ -76,16 +76,31 @@
     box-shadow: var(--shadow-md);
 }
 
-/* Markdown Styles */
+/* Markdown Styles - Unified Headings */
 .markdown-body h1,
 .markdown-body h2,
-.markdown-body h3 {
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
     margin-top: 1.5em;
     margin-bottom: 0.75em;
-    color: var(--color-text-primary);
+    color: var(--color-primary);
     font-weight: 700;
     font-size: 1.15rem;
     /* Unified font size for all headings */
+}
+
+/* Style bold text in lists/paragraphs to look like headings (for old cache compatibility) */
+.markdown-body li>p>strong:only-child,
+.markdown-body li>strong:first-child,
+.markdown-body p>strong:only-child {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 1.15rem;
+    display: block;
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
 }
 
 .markdown-body p {
