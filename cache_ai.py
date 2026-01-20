@@ -11,7 +11,7 @@ Cách sử dụng:
     python cache_ai.py 1-10 --force  # Ghi đè cache cũ
 
 Yêu cầu:
-    pip install httpx google-generativeai python-dotenv
+    pip install httpx google-genai python-dotenv
 """
 
 import os
@@ -21,7 +21,7 @@ import time
 from typing import Optional
 from dotenv import load_dotenv
 import httpx
-import google.generativeai as genai
+from google import genai
 
 # Load environment variables
 load_dotenv()
@@ -164,9 +164,11 @@ def call_gemini(prompt: str, max_retries: int = 3) -> Optional[str]:
         
         for attempt in range(max_retries):
             try:
-                genai.configure(api_key=api_key)
-                model = genai.GenerativeModel('gemini-2.5-flash')
-                response = model.generate_content(prompt)
+                client = genai.Client(api_key=api_key)
+                response = client.models.generate_content(
+                    model='gemini-2.0-flash-exp',
+                    contents=prompt
+                )
                 return response.text
             except Exception as e:
                 error_str = str(e).lower()
@@ -215,23 +217,29 @@ def get_cached_content(question_id: str, language: str, content_type: str) -> Op
 
 
 def save_to_cache(question_id: str, language: str, content_type: str, content: str) -> bool:
-    """Lưu kết quả vào Supabase cache (upsert)"""
+    """Lưu kết quả vào Supabase cache (delete + insert để handle unique constraint)"""
     try:
         url = f"{SUPABASE_URL}/rest/v1/ai_cache"
         
-        # Upsert headers
-        upsert_headers = HEADERS.copy()
-        upsert_headers['Prefer'] = 'resolution=merge-duplicates'
-        
-        data = {
-            'question_id': question_id,
-            'language': language,
-            'type': content_type,
-            'content': content
-        }
-        
         with httpx.Client() as client:
-            response = client.post(url, headers=upsert_headers, json=data)
+            # Step 1: Delete existing record if exists (to handle unique constraint)
+            delete_params = {
+                'question_id': f'eq.{question_id}',
+                'language': f'eq.{language}',
+                'type': f'eq.{content_type}'
+            }
+            client.delete(url, headers=HEADERS, params=delete_params)
+            # Ignore delete errors - record might not exist
+            
+            # Step 2: Insert new record
+            data = {
+                'question_id': question_id,
+                'language': language,
+                'type': content_type,
+                'content': content
+            }
+            
+            response = client.post(url, headers=HEADERS, json=data)
             
             if response.status_code in [200, 201, 204]:
                 return True
