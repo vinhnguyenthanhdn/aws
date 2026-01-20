@@ -2,36 +2,68 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { supabase } from './supabase';
 import type { Language } from '../types';
 
-const getApiKey = () => {
+const getAllApiKeys = (): string[] => {
     // Try to get list of keys first
     const keysString = import.meta.env.VITE_GOOGLE_API_KEYS || '';
     const keys = keysString.split(',').map((k: string) => k.trim()).filter((k: string) => k.length > 0);
 
     // Fallback to single key if list is empty
     if (keys.length === 0) {
-        return import.meta.env.VITE_GEMINI_API_KEY || '';
+        const singleKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+        return singleKey ? [singleKey] : [];
     }
 
-    // Return random key from list
-    return keys[Math.floor(Math.random() * keys.length)];
+    return keys;
 };
 
 async function callGeminiAPI(prompt: string): Promise<string> {
-    const apiKey = getApiKey();
-    if (!apiKey) {
+    const apiKeys = getAllApiKeys();
+
+    if (apiKeys.length === 0) {
         throw new Error('No API Key configured');
     }
 
-    try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    let lastError: any = null;
 
-        const result = await model.generateContent(prompt);
-        return result.response.text() || 'No response generated';
-    } catch (error) {
-        console.error('Error calling Gemini API:', error);
-        throw error;
+    // Try each API key until one succeeds
+    for (let i = 0; i < apiKeys.length; i++) {
+        const apiKey = apiKeys[i];
+        const keyId = `key ${i + 1}/${apiKeys.length}`;
+
+        try {
+            console.log(`🔑 Trying ${keyId}...`);
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+            const result = await model.generateContent(prompt);
+            const text = result.response.text();
+
+            if (text && text.trim() !== '') {
+                console.log(`✅ ${keyId} succeeded`);
+                return text;
+            }
+
+            console.warn(`⚠️ ${keyId} returned empty response`);
+        } catch (error: any) {
+            lastError = error;
+            const errorMsg = error?.message || String(error);
+
+            // Check if it's a rate limit or quota error
+            if (errorMsg.toLowerCase().includes('quota') ||
+                errorMsg.toLowerCase().includes('rate') ||
+                errorMsg.toLowerCase().includes('429')) {
+                console.warn(`⚠️ ${keyId} rate limited, trying next key...`);
+                continue; // Try next key
+            }
+
+            // For other errors, also try next key
+            console.warn(`⚠️ ${keyId} failed: ${errorMsg}, trying next key...`);
+        }
     }
+
+    // All keys exhausted
+    console.error('❌ All API keys exhausted!');
+    throw new Error('AI_SERVICE_UNAVAILABLE');
 }
 
 async function getCachedAIContent(

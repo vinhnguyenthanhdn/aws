@@ -282,8 +282,22 @@ function App() {
                 ...prev,
                 [cacheKey]: theory,
             }));
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error getting theory:', error);
+
+            // Check if it's AI service unavailable error
+            if (error?.message === 'AI_SERVICE_UNAVAILABLE') {
+                const errorMessage = language === 'vi'
+                    ? '⚠️ Dịch vụ AI hiện đang quá tải. Vui lòng thử lại sau vài phút.'
+                    : '⚠️ AI service is currently overloaded. Please try again in a few minutes.';
+                alert(errorMessage);
+            } else {
+                const errorMessage = language === 'vi'
+                    ? '❌ Không thể tải lý thuyết. Vui lòng thử lại.'
+                    : '❌ Failed to load theory. Please try again.';
+                alert(errorMessage);
+            }
+
             setActiveAISection(null);
         } finally {
             setAiLoading(false);
@@ -325,8 +339,22 @@ function App() {
                 ...prev,
                 [cacheKey]: explanation,
             }));
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error getting explanation:', error);
+
+            // Check if it's AI service unavailable error
+            if (error?.message === 'AI_SERVICE_UNAVAILABLE') {
+                const errorMessage = language === 'vi'
+                    ? '⚠️ Dịch vụ AI hiện đang quá tải. Vui lòng thử lại sau vài phút.'
+                    : '⚠️ AI service is currently overloaded. Please try again in a few minutes.';
+                alert(errorMessage);
+            } else {
+                const errorMessage = language === 'vi'
+                    ? '❌ Không thể tải giải thích. Vui lòng thử lại.'
+                    : '❌ Failed to load explanation. Please try again.';
+                alert(errorMessage);
+            }
+
             setActiveAISection(null);
         } finally {
             setAiLoading(false);
