@@ -49,7 +49,12 @@ async function getCachedAIContent(
             .maybeSingle();
 
         if (error) {
-            console.error(`❌ Database error fetching cache for Q${questionId} (${type}, ${language}):`, error);
+            console.error(`❌ Database error fetching cache for Q${questionId} (${type}, ${language}):`, {
+                message: error.message,
+                code: error.code,
+                details: error.details,
+                hint: error.hint
+            });
             return null;
         }
 
