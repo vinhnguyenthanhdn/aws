@@ -258,7 +258,7 @@ function App() {
 
         const cacheKey = `theory_${currentQuestion.id}_${language}`;
 
-        // Check if already cached
+        // Check if already loaded in memory (UI state)
         if (aiContent[cacheKey]) {
             setActiveAISection('theory');
             return;
@@ -269,6 +269,7 @@ function App() {
 
         try {
             const optionsText = currentQuestion.options.join('\n');
+            // getAITheory will check database cache first before calling Gemini API
             const theory = await getAITheory(
                 currentQuestion.question,
                 optionsText,
@@ -276,6 +277,7 @@ function App() {
                 language
             );
 
+            // Store in memory for this session
             setAiContent(prev => ({
                 ...prev,
                 [cacheKey]: theory,
@@ -298,7 +300,7 @@ function App() {
 
         const cacheKey = `explanation_${currentQuestion.id}_${language}`;
 
-        // Check if already cached
+        // Check if already loaded in memory (UI state)
         if (aiContent[cacheKey]) {
             setActiveAISection('explanation');
             return;
@@ -309,6 +311,7 @@ function App() {
 
         try {
             const optionsText = currentQuestion.options.join('\n');
+            // getAIExplanation will check database cache first before calling Gemini API
             const explanation = await getAIExplanation(
                 currentQuestion.question,
                 optionsText,
@@ -317,6 +320,7 @@ function App() {
                 language
             );
 
+            // Store in memory for this session
             setAiContent(prev => ({
                 ...prev,
                 [cacheKey]: explanation,

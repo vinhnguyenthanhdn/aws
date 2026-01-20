@@ -48,9 +48,19 @@ async function getCachedAIContent(
             .eq('type', type)
             .maybeSingle();
 
-        if (error || !data) return null;
+        if (error) {
+            console.error(`❌ Database error fetching cache for Q${questionId} (${type}, ${language}):`, error);
+            return null;
+        }
+
+        if (!data) {
+            console.log(`📭 No cache found in DB for Q${questionId} (${type}, ${language})`);
+            return null;
+        }
+
         return data.content;
-    } catch {
+    } catch (err) {
+        console.error(`❌ Exception in getCachedAIContent:`, err);
         return null;
     }
 }
@@ -82,7 +92,11 @@ export async function getAIExplanation(
 ): Promise<string> {
     // Check cache first
     const cached = await getCachedAIContent(questionId, language, 'explanation');
-    if (cached) return cached;
+    if (cached) {
+        console.log(`✅ Cache HIT for explanation: Q${questionId} (${language})`);
+        return cached;
+    }
+    console.log(`🔄 Cache MISS - Calling Gemini API for explanation: Q${questionId} (${language})`);
 
     const languageInstruction = language === 'vi'
         ? 'Vui lòng trả lời bằng tiếng Việt.'
@@ -129,7 +143,11 @@ export async function getAITheory(
 ): Promise<string> {
     // Check cache first
     const cached = await getCachedAIContent(questionId, language, 'theory');
-    if (cached) return cached;
+    if (cached) {
+        console.log(`✅ Cache HIT for theory: Q${questionId} (${language})`);
+        return cached;
+    }
+    console.log(`🔄 Cache MISS - Calling Gemini API for theory: Q${questionId} (${language})`);
 
     const languageInstruction = language === 'vi'
         ? 'Vui lòng trả lời bằng tiếng Việt.'
