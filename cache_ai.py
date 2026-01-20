@@ -136,14 +136,38 @@ def get_theory_prompt(question: str, options: str, language: str) -> str:
     language_instruction = 'Vui lòng trả lời bằng tiếng Việt.' if language == 'vi' else 'Please respond in English.'
     
     prompt_structure = """## Cơ sở lý thuyết các thuật ngữ trong câu hỏi
-Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật được đề cập trong câu hỏi. Mỗi thuật ngữ cần được giải thích ngắn gọn nhưng đầy đủ.
+
+Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật được đề cập trong câu hỏi.
+
+Định dạng cho mỗi thuật ngữ:
+- **Tên thuật ngữ** (in đậm, không có dấu hai chấm)
+- Giải thích ngắn gọn và đầy đủ về thuật ngữ đó (trên dòng mới)
 
 ## Cơ sở lý thuyết các thuật ngữ trong đáp án
-Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật xuất hiện trong các đáp án (A, B, C, D). Đặc biệt chú ý những thuật ngữ khác với phần câu hỏi.""" if language == 'vi' else """## Theoretical Foundation of Question Terms
-List and explain ALL AWS services, concepts, and technical terms mentioned in the question. Each term should be explained concisely but thoroughly.
+
+Liệt kê và giải thích TẤT CẢ các AWS services, concepts, và thuật ngữ kỹ thuật xuất hiện trong các đáp án (A, B, C, D).
+
+Định dạng cho mỗi thuật ngữ:
+- **Tên thuật ngữ** (in đậm, không có dấu hai chấm)
+- Giải thích ngắn gọn và đầy đủ về thuật ngữ đó (trên dòng mới)
+
+QUAN TRỌNG: KHÔNG dùng dấu hai chấm (:) sau tên thuật ngữ.""" if language == 'vi' else """## Theoretical Foundation of Question Terms
+
+List and explain ALL AWS services, concepts, and technical terms mentioned in the question.
+
+Format for each term:
+- **Term name** (bold, NO colon)
+- Concise but thorough explanation (on new line)
 
 ## Theoretical Foundation of Answer Terms
-List and explain ALL AWS services, concepts, and technical terms appearing in the answers (A, B, C, D). Pay special attention to terms that differ from those in the question."""
+
+List and explain ALL AWS services, concepts, and technical terms appearing in the answers (A, B, C, D).
+
+Format for each term:
+- **Term name** (bold, NO colon)
+- Concise but thorough explanation (on new line)
+
+IMPORTANT: Do NOT use colons (:) after term names."""
     
     return f"""You are an AWS Solutions Architect expert. Provide theoretical foundation for this question.
 

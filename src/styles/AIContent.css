@@ -76,7 +76,7 @@
     box-shadow: var(--shadow-md);
 }
 
-/* Markdown Styles - Complete Uniformity */
+/* Markdown Styles - Typography Hierarchy */
 
 /* Remove ALL list styling */
 .markdown-body ol,
@@ -87,19 +87,29 @@
 }
 
 .markdown-body li {
-    margin-bottom: 1em;
+    margin-bottom: 1.2em;
     padding-left: 0;
 }
 
-/* Force ALL headings to same style */
+/* MAIN HEADINGS (h2, h3) - Largest */
 .markdown-body h1,
 .markdown-body h2,
-.markdown-body h3,
+.markdown-body h3 {
+    margin-top: 2em;
+    margin-bottom: 0.8em;
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 1.3rem;
+    /* LARGE - Main sections */
+    line-height: 1.4;
+}
+
+/* h4, h5, h6 smaller than main but larger than sub-items */
 .markdown-body h4,
 .markdown-body h5,
 .markdown-body h6 {
-    margin-top: 1.8em;
-    margin-bottom: 0.8em;
+    margin-top: 1.5em;
+    margin-bottom: 0.6em;
     color: var(--color-primary);
     font-weight: 700;
     font-size: 1.15rem;
@@ -113,15 +123,26 @@
     margin-top: 0 !important;
 }
 
-/* Force strong tags to look like headings when they're standalone */
+/* SUB-ITEMS in lists (strong tags) - Medium size */
 .markdown-body li>strong,
-.markdown-body li>p>strong,
+.markdown-body li>p>strong:first-child {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 1.05rem;
+    /* MEDIUM - Sub-items */
+    display: block;
+    margin-bottom: 0.5em;
+    line-height: 1.4;
+}
+
+/* Standalone strong in paragraph (rare case) */
 .markdown-body p>strong:only-child {
     color: var(--color-primary);
     font-weight: 700;
-    font-size: 1.15rem;
+    font-size: 1.3rem;
+    /* Same as main heading */
     display: block;
-    margin-top: 1.8em;
+    margin-top: 2em;
     margin-bottom: 0.8em;
     line-height: 1.4;
 }
@@ -134,15 +155,17 @@
     margin-top: 0 !important;
 }
 
-/* Regular paragraph text */
+/* BODY TEXT - Smallest */
 .markdown-body p {
     margin-bottom: 1em;
     line-height: 1.8;
     color: var(--color-text-primary);
+    font-size: 0.95rem;
+    /* SMALL - Body text */
 }
 
-/* Inline strong (not heading-like) */
-.markdown-body p strong:not(:only-child) {
+/* Inline strong (not heading-like) - Keep normal size */
+.markdown-body p strong:not(:only-child):not(:first-child) {
     color: var(--color-primary);
     font-weight: 600;
     font-size: inherit;
