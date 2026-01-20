@@ -23,6 +23,18 @@ export const AIContent: React.FC<AIContentProps> = ({
     const t = (key: string) => getText(language, key);
     const title = type === 'theory' ? t('ai_theory') : t('ai_explanation');
 
+    // Clean AI output - remove leading colons and extra spacing
+    const cleanContent = (text: string): string => {
+        return text
+            // Remove ": " after bold keywords
+            .replace(/(\*\*[^*]+\*\*)\s*:\s*/g, '$1\n\n')
+            // Remove standalone ": " at start of lines  
+            .replace(/^\s*:\s+/gm, '')
+            // Clean up multiple newlines
+            .replace(/\n{3,}/g, '\n\n')
+            .trim();
+    };
+
     return (
         <div className={`ai-content card ${type}`}>
             <div className="ai-content-header">
@@ -30,7 +42,7 @@ export const AIContent: React.FC<AIContentProps> = ({
             </div>
             <div className="ai-content-body markdown-body">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {content}
+                    {cleanContent(content)}
                 </ReactMarkdown>
             </div>
             {discussionLink && type === 'explanation' && (

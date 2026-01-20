@@ -146,33 +146,47 @@ export async function getAIExplanation(
 
     const promptStructure = language === 'vi'
         ? `## Giải thích câu hỏi
+
 Phân tích yêu cầu chính của câu hỏi, xác định các điểm mấu chốt cần chú ý.
 
 ## Giải thích đáp án đúng
-Tại sao đáp án ${correctAnswer} là đúng? Giải thích chi tiết cách nó đáp ứng yêu cầu của câu hỏi.
+
+Tại sao đáp án ${correctAnswer} là đúng? Giải thích chi tiết.
 
 ## Tại sao không chọn các đáp án khác
-Phân tích từng đáp án sai, giải thích lý do tại sao chúng không phù hợp hoặc không tối ưu.
 
-## Các lỗi thường gặp (Common Mistakes)
-Liệt kê các lỗi mà thí sinh hay mắc phải khi gặp dạng câu hỏi này.
+Phân tích từng đáp án sai, giải thích lý do.
 
-## Mẹo để nhớ (Tips to Remember)
-Cung cấp các mẹo, tricks hoặc cách nhớ nhanh để áp dụng cho các câu hỏi tương tự.`
+## Các lỗi thường gặp
+
+Liệt kê các lỗi mà thí sinh hay mắc phải.
+
+## Mẹo để nhớ
+
+Cung cấp các mẹo, tricks để áp dụng cho các câu hỏi tương tự.
+
+QUAN TRỌNG: Khi đề cập đến các keywords hoặc concepts trong nội dung, viết chúng ở dạng **in đậm** KHÔNG CÓ dấu hai chấm (:) phía sau. Ví dụ: **Keyword** chứ không phải **Keyword:**`
         : `## Question Analysis
-Analyze the main requirements of the question and identify the key points to focus on.
+
+Analyze the main requirements of the question and identify the key points.
 
 ## Correct Answer Explanation
-Why is answer ${correctAnswer} correct? Explain in detail how it meets the question's requirements.
+
+Why is answer ${correctAnswer} correct? Explain in detail.
 
 ## Why Other Answers Are Wrong
-Analyze each incorrect answer and explain why they are not suitable or not optimal.
+
+Analyze each incorrect answer and explain why.
 
 ## Common Mistakes
-List the mistakes that students often make when encountering this type of question.
+
+List the mistakes students often make.
 
 ## Tips to Remember
-Provide tips, tricks, or memorization techniques to apply to similar questions.`;
+
+Provide tips and tricks to apply to similar questions.
+
+IMPORTANT: When mentioning keywords or concepts in content, write them in **bold** withOUT colons (:) after. Example: **Keyword** NOT **Keyword:**`;
 
     const prompt = `You are an AWS Solutions Architect expert. Analyze this SAA-C03 exam question.
 
@@ -185,9 +199,11 @@ Correct Answer: ${correctAnswer}
 
 ${languageInstruction}
 
-IMPORTANT: Start directly with the analysis. Do NOT include any greetings, introductions (like "Chào bạn, là một chuyên gia..." or "Hello, as an expert..."), or conclusions. Go straight to the structured content below.
+IMPORTANT: Start directly with the analysis. Do NOT include any greetings, introductions, or conclusions. Go straight to the structured content.
 
-Provide a comprehensive explanation covering:
+Do NOT use colons (:) after bold keywords. Write descriptions on the same line or new line without colons.
+
+Provide a comprehensive explanation:
 
 ${promptStructure}
 
