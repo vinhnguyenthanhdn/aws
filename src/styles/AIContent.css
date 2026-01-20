@@ -76,42 +76,83 @@
     box-shadow: var(--shadow-md);
 }
 
-/* Markdown Styles - Unified Headings */
+/* Markdown Styles - Complete Uniformity */
+
+/* Remove ALL list styling */
+.markdown-body ol,
+.markdown-body ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.markdown-body li {
+    margin-bottom: 1em;
+    padding-left: 0;
+}
+
+/* Force ALL headings to same style */
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3,
 .markdown-body h4,
 .markdown-body h5,
 .markdown-body h6 {
-    margin-top: 1.5em;
-    margin-bottom: 0.75em;
+    margin-top: 1.8em;
+    margin-bottom: 0.8em;
     color: var(--color-primary);
     font-weight: 700;
     font-size: 1.15rem;
-    /* Unified font size for all headings */
+    line-height: 1.4;
 }
 
-/* Style bold text in lists/paragraphs to look like headings (for old cache compatibility) */
-.markdown-body li>p>strong:only-child,
-.markdown-body li>strong:first-child,
+/* First heading should have less top margin */
+.markdown-body>*:first-child,
+.markdown-body>ol:first-child>li:first-child,
+.markdown-body>ul:first-child>li:first-child {
+    margin-top: 0 !important;
+}
+
+/* Force strong tags to look like headings when they're standalone */
+.markdown-body li>strong,
+.markdown-body li>p>strong,
 .markdown-body p>strong:only-child {
     color: var(--color-primary);
     font-weight: 700;
     font-size: 1.15rem;
     display: block;
-    margin-top: 1.5em;
-    margin-bottom: 0.75em;
+    margin-top: 1.8em;
+    margin-bottom: 0.8em;
+    line-height: 1.4;
 }
 
+/* Special case: first strong in first li should have no top margin */
+.markdown-body>ol:first-child>li:first-child>strong,
+.markdown-body>ol:first-child>li:first-child>p>strong,
+.markdown-body>ul:first-child>li:first-child>strong,
+.markdown-body>ul:first-child>li:first-child>p>strong {
+    margin-top: 0 !important;
+}
+
+/* Regular paragraph text */
 .markdown-body p {
     margin-bottom: 1em;
     line-height: 1.8;
+    color: var(--color-text-primary);
+}
+
+/* Inline strong (not heading-like) */
+.markdown-body p strong:not(:only-child) {
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: inherit;
+    display: inline;
+    margin: 0;
 }
 
 .markdown-body ul,
 .markdown-body ol {
     margin-bottom: 1em;
-    padding-left: 1.5em;
 }
 
 .markdown-body li {
