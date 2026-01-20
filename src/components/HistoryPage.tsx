@@ -138,24 +138,21 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
                                     });
 
                                     return (
-                                        <div key={sub.id} className="submission-menu-item">
-                                            <div className="submission-header">
-                                                <div className="attempt-badge">
-                                                    #{groupSubs.length - idx}
-                                                </div>
-                                                <div className={`status-badge ${sub.is_correct ? 'correct' : 'incorrect'}`}>
+                                        <div key={sub.id} className="submission-item-compact">
+                                            <div className="sub-left-content">
+                                                <span className="attempt-number">#{groupSubs.length - idx}</span>
+                                                <span className={`status-tag ${sub.is_correct ? 'correct' : 'incorrect'}`}>
                                                     {sub.is_correct ? 'CORRECT' : 'INCORRECT'}
-                                                </div>
+                                                </span>
+                                                <span className="answer-text">
+                                                    You chose: <strong>{sub.answer}</strong>
+                                                </span>
                                             </div>
 
-                                            <div className="submission-body">
-                                                <div className="answer-display">
-                                                    You chose: <strong>{sub.answer}</strong>
-                                                </div>
-                                                <div className="submission-meta">
-                                                    <span className="date">{formattedDate}</span>
-                                                    <span className="time">{formattedTime}</span>
-                                                </div>
+                                            <div className="sub-right-content">
+                                                <span className="sub-datetime">
+                                                    {formattedDate} <span className="time-separator">at</span> {formattedTime}
+                                                </span>
                                             </div>
                                         </div>
                                     );
