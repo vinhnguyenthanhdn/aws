@@ -65,6 +65,12 @@ async function getCachedAIContent(
             return null;
         }
 
+        // Validate content is not empty or error message
+        if (!data.content || data.content.trim() === '' || data.content === 'No response generated') {
+            console.warn(`⚠️ Invalid cache content for Q${questionId} (${type}, ${language}), will regenerate`);
+            return null;
+        }
+
         return data.content;
     } catch (err) {
         console.error(`❌ Exception in getCachedAIContent:`, err);
@@ -109,7 +115,7 @@ export async function getAIExplanation(
         ? 'Vui lòng trả lời bằng tiếng Việt.'
         : 'Please respond in English.';
 
-    const prompt = `You are an AWS Solutions Architect expert helping students prepare for the SAA-C03 exam.
+    const prompt = `You are an AWS Solutions Architect expert. Analyze this SAA-C03 exam question.
 
 Question: ${question}
 
@@ -119,6 +125,8 @@ ${options}
 Correct Answer: ${correctAnswer}
 
 ${languageInstruction}
+
+IMPORTANT: Start directly with the analysis. Do NOT include any greetings, introductions (like "Chào bạn, là một chuyên gia..."), or conclusions. Go straight to the structured content below.
 
 Provide a comprehensive explanation covering:
 
@@ -136,8 +144,12 @@ Keep the explanation structured and easy to understand (max 500 words).`;
 
     const content = await callGeminiAPI(prompt);
 
-    // Cache the result
-    await setCachedAIContent(questionId, language, 'explanation', content);
+    // Only cache if content is valid
+    if (content && content.trim() !== '' && content !== 'No response generated') {
+        await setCachedAIContent(questionId, language, 'explanation', content);
+    } else {
+        console.warn(`⚠️ Not caching invalid explanation for Q${questionId}`);
+    }
 
     return content;
 }
@@ -160,7 +172,7 @@ export async function getAITheory(
         ? 'Vui lòng trả lời bằng tiếng Việt.'
         : 'Please respond in English.';
 
-    const prompt = `You are an AWS Solutions Architect expert. Provide theoretical foundation for understanding this question.
+    const prompt = `You are an AWS Solutions Architect expert. Provide theoretical foundation for this question.
 
 Question: ${question}
 
@@ -168,6 +180,8 @@ Options:
 ${options}
 
 ${languageInstruction}
+
+IMPORTANT: Start directly with the theoretical content. Do NOT include any greetings, introductions (like "Chào bạn, là một chuyên gia..."), or conclusions. Go straight to the structured content below.
 
 Provide a comprehensive theoretical breakdown:
 
@@ -179,8 +193,12 @@ Keep the theory organized and easy to reference (max 500 words).`;
 
     const content = await callGeminiAPI(prompt);
 
-    // Cache the result
-    await setCachedAIContent(questionId, language, 'theory', content);
+    // Only cache if content is valid
+    if (content && content.trim() !== '' && content !== 'No response generated') {
+        await setCachedAIContent(questionId, language, 'theory', content);
+    } else {
+        console.warn(`⚠️ Not caching invalid theory for Q${questionId}`);
+    }
 
     return content;
 }

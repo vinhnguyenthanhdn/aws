@@ -83,7 +83,7 @@ def get_explanation_prompt(question: str, options: str, correct_answer: str, lan
     """Tạo prompt cho Giải thích (Explanation)"""
     language_instruction = 'Vui lòng trả lời bằng tiếng Việt.' if language == 'vi' else 'Please respond in English.'
     
-    return f"""You are an AWS Solutions Architect expert helping students prepare for the SAA-C03 exam.
+    return f"""You are an AWS Solutions Architect expert. Analyze this SAA-C03 exam question.
 
 Question: {question}
 
@@ -93,6 +93,8 @@ Options:
 Correct Answer: {correct_answer}
 
 {language_instruction}
+
+IMPORTANT: Start directly with the analysis. Do NOT include any greetings, introductions (like "Chào bạn, là một chuyên gia..."), or conclusions. Go straight to the structured content below.
 
 Provide a comprehensive explanation covering:
 
@@ -113,7 +115,7 @@ def get_theory_prompt(question: str, options: str, language: str) -> str:
     """Tạo prompt cho Lý Thuyết (Theory)"""
     language_instruction = 'Vui lòng trả lời bằng tiếng Việt.' if language == 'vi' else 'Please respond in English.'
     
-    return f"""You are an AWS Solutions Architect expert. Provide theoretical foundation for understanding this question.
+    return f"""You are an AWS Solutions Architect expert. Provide theoretical foundation for this question.
 
 Question: {question}
 
@@ -121,6 +123,8 @@ Options:
 {options}
 
 {language_instruction}
+
+IMPORTANT: Start directly with the theoretical content. Do NOT include any greetings, introductions (like "Chào bạn, là một chuyên gia..."), or conclusions. Go straight to the structured content below.
 
 Provide a comprehensive theoretical breakdown:
 
