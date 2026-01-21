@@ -1,0 +1,11 @@
+# Ignore Python requirements to prevent Vercel from attempting to install them
+requirements.txt
+requirements-cache.txt
+requirements-migration.txt
+*.py
+streamlit-archive/
+
+# Ignore other non-production files
+.git
+.ds_store
+*.md
